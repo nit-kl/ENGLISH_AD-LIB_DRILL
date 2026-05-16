@@ -1,0 +1,18 @@
+{
+  "name": "english-ad-lib-drill",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "pnpm -r run test",
+    "test:e2e": "pnpm --filter @english-adlib/e2e e2e",
+    "test:watch": "pnpm --filter @english-adlib/domain test:watch",
+    "build": "pnpm -r run build",
+    "dev:web": "pnpm --filter @english-adlib/web dev",
+    "dev:api": "pnpm --filter @english-adlib/api dev",
+    "lint": "pnpm -r run lint --if-present"
+  },
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
