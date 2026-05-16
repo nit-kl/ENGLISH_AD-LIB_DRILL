@@ -10,15 +10,30 @@
 
 ## 必要環境
 
-- **Node.js 20.18+**（`pnpm dev:api` / Wrangler 3 系）
-- Node 22 を使う場合は `wrangler` を 4 系に上げられます（[Wrangler の要件](https://developers.cloudflare.com/workers/wrangler/install-and-update/)）
+- **Node.js 24 LTS**（開発環境の基準: **v24.15.0**。Wrangler 4 対応）
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)（`apps/api` に同梱）
+- バージョン指定: リポジトリルートの `.nvmrc`（`24`）/ `.node-version`（`24.15.0`）
 
-Windows でバージョンを切り替える例（nvm-windows）:
+### Windows で Node を入れる
+
+**推奨: winget**
 
 ```powershell
-nvm install 20.18.0
-nvm use 20.18.0
+winget install OpenJS.NodeJS.LTS
 ```
+
+インストール後、PowerShell をいったん閉じて開き直し:
+
+```powershell
+node -v   # v24.15.0 など v24.x であること
+```
+
+`--version 22.x.x` などは winget のカタログに無いことがあります。LTS チャンネルは **v24 系** です。
+
+**その他**
+
+- [nodejs.org](https://nodejs.org/) から LTS インストーラー
+- 複数バージョン管理: [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) → `nvm install 24` / `nvm use 24`
 
 ## 開発
 

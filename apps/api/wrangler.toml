@@ -4,6 +4,7 @@ compatibility_date = "2025-04-01"
 
 [ai]
 binding = "AI"
+remote = true
 
 [vars]
 SCORING_MODEL = "@cf/meta/llama-3.2-1b-instruct"

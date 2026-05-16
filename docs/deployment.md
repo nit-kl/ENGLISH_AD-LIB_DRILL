@@ -4,7 +4,7 @@
 
 - Cloudflare アカウント
 - [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) ログイン済み
-- **Node.js 20.18+**（本リポジトリは Wrangler `3.114.x` を使用。Wrangler 4 は Node 22 必須）
+- **Node.js 24 LTS**（基準 v24.15.0、`winget install OpenJS.NodeJS.LTS`。Wrangler 4）
 
 ## API（Workers）
 
