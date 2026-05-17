@@ -25,18 +25,17 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("タイトルからモード選択まで遷移できる", async ({ page }) => {
+test("タイトルからステージ選択まで遷移できる", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /英会話/ })).toBeVisible();
   await page.getByRole("button", { name: "はじめる" }).click();
-  await expect(page.getByRole("heading", { name: "モードを選ぶ" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "検定モード" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ステージ選択" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /初級/ })).toBeVisible();
 });
 
-test("ステージモードで1問回答して採点結果が表示される", async ({ page }) => {
+test("1問回答して採点結果が表示される", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "はじめる" }).click();
-  await page.getByRole("button", { name: "ステージモード" }).click();
   await page.getByRole("button", { name: /初級/ }).click();
   await page.getByRole("button", { name: /カフェで注文/ }).click();
 
@@ -50,7 +49,6 @@ test("ステージモードで1問回答して採点結果が表示される", a
 test("動画お題で続きを見る→Part2視聴後に次へ進める", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "はじめる" }).click();
-  await page.getByRole("button", { name: "ステージモード" }).click();
   await page.getByRole("button", { name: /初級/ }).click();
   await page.getByRole("button", { name: /カフェで注文/ }).click();
 

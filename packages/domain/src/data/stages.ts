@@ -193,23 +193,10 @@ export const STAGES: Record<StageKey, Stage> = {
   },
 };
 
-export const CERT_QUESTION_IDS: string[] = [
-  ...STAGES.beginner.questions.map((q) => q.id),
-  ...STAGES.intermediate.questions.map((q) => q.id),
-  ...STAGES.advanced.questions.map((q) => q.id),
-  STAGES.legendary.questions[0].id,
-];
-
 export function getQuestionById(id: string): Question | undefined {
   for (const stage of Object.values(STAGES)) {
     const found = stage.questions.find((q) => q.id === id);
     if (found) return found;
   }
   return undefined;
-}
-
-export function getCertQuestions(): Question[] {
-  return CERT_QUESTION_IDS.map((id) => getQuestionById(id)).filter(
-    (q): q is Question => q !== undefined,
-  );
 }
