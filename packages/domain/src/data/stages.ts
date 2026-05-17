@@ -29,6 +29,17 @@ export const STAGES: Record<StageKey, Stage> = {
         role: "お客さん",
         icon: "☕",
         hints: ["I'd like ~", "Can I have ~", "a tall iced latte"],
+        // moviecreate 公開後に YouTube の videoId / endSeconds を差し替え
+        media: {
+          setup: {
+            youtubeVideoId: "aqz-KE-bpKQ",
+            endSeconds: 45,
+          },
+          reveal: {
+            youtubeVideoId: "aqz-KE-bpKQ",
+            startSeconds: 45,
+          },
+        },
       },
       {
         id: "beginner-2",

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   getCertQuestions,
+  hasQuestionMedia,
   STAGES,
   type Question,
   type ScoreFeedback,
@@ -11,12 +12,17 @@ import { useVoiceInput } from "./hooks/useVoiceInput";
 import { CertResultScreen } from "./screens/CertResultScreen";
 import { ModeSelectScreen } from "./screens/ModeSelectScreen";
 import { PlayingScreen } from "./screens/PlayingScreen";
+import { RevealScreen } from "./screens/RevealScreen";
 import { ResultScreen } from "./screens/ResultScreen";
 import { StageSelectScreen } from "./screens/StageSelectScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 
-type Screen = "title" | "modeSelect" | "stageSelect" | "playing" | "result" | "certResult";
+type Screen = "title" | "modeSelect" | "stageSelect" | "playing" | "reveal" | "result" | "certResult";
 type Mode = "cert" | "stage";
+
+function initialSetupComplete(question: Question | undefined): boolean {
+  return question == null || !hasQuestionMedia(question);
+}
 
 export function App() {
   const [screen, setScreen] = useState<Screen>("title");
@@ -30,9 +36,10 @@ export function App() {
   const [certScores, setCertScores] = useState<number[]>([]);
   const [showScoring, setShowScoring] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
-  const [showHint, setShowHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ApiClientError | null>(null);
+  const [setupComplete, setSetupComplete] = useState(false);
+  const [answerTimerActive, setAnswerTimerActive] = useState(false);
 
   const appendTranscript = useCallback((text: string) => {
     setUserInput((prev) => (prev ? `${prev} ${text}` : text));
@@ -66,7 +73,7 @@ export function App() {
       setSubmitError(
         e instanceof ApiClientError
           ? e
-          : new ApiClientError("?????????", "SCORING_FAILED", 502, true),
+          : new ApiClientError("採点に失敗しました", "SCORING_FAILED", 502, true),
       );
     } finally {
       setIsSubmitting(false);
@@ -74,14 +81,26 @@ export function App() {
   }, [showScoring, isSubmitting, mode, currentStage, questionIndex, userInput, voice]);
 
   useEffect(() => {
-    if (screen === "playing" && timeLeft > 0 && !showScoring && !isSubmitting) {
+    if (
+      screen === "playing" &&
+      answerTimerActive &&
+      timeLeft > 0 &&
+      !showScoring &&
+      !isSubmitting
+    ) {
       const t = setTimeout(() => setTimeLeft((v) => v - 1), 1000);
       return () => clearTimeout(t);
     }
-    if (timeLeft === 0 && screen === "playing" && !showScoring && !isSubmitting) {
+    if (
+      timeLeft === 0 &&
+      screen === "playing" &&
+      answerTimerActive &&
+      !showScoring &&
+      !isSubmitting
+    ) {
       void handleSubmit();
     }
-  }, [timeLeft, screen, showScoring, isSubmitting, handleSubmit]);
+  }, [timeLeft, screen, answerTimerActive, showScoring, isSubmitting, handleSubmit]);
 
   useEffect(() => {
     if (showScoring && score !== null) {
@@ -98,22 +117,31 @@ export function App() {
     }
   }, [showScoring, score]);
 
-  const resetPlayState = () => {
+  const resetPlayState = (question?: Question) => {
     setUserInput("");
     setTimeLeft(60);
     setScore(null);
     setFeedback(null);
     setShowScoring(false);
-    setShowHint(false);
     setSubmitError(null);
+    const ready = initialSetupComplete(question);
+    setSetupComplete(ready);
+    setAnswerTimerActive(ready);
     voice.stop();
   };
+
+  const handleSetupComplete = useCallback(() => {
+    setSetupComplete(true);
+    setAnswerTimerActive(true);
+    setTimeLeft(60);
+  }, []);
 
   const handleStartCert = () => {
     setMode("cert");
     setQuestionIndex(0);
     setCertScores([]);
-    resetPlayState();
+    const q = getCertQuestions()[0];
+    resetPlayState(q);
     setScreen("playing");
   };
 
@@ -121,7 +149,7 @@ export function App() {
     setMode("stage");
     setCurrentStage(key);
     setQuestionIndex(0);
-    resetPlayState();
+    resetPlayState(STAGES[key].questions[0]);
     setScreen("playing");
   };
 
@@ -143,7 +171,13 @@ export function App() {
     } else {
       setQuestionIndex(questionIndex + 1);
     }
-    resetPlayState();
+    const nextQ = questions[questionIndex + 1];
+    resetPlayState(nextQ);
+    setScreen("playing");
+  };
+
+  const handleContinueToReveal = () => {
+    setScreen("reveal");
   };
 
   const handleHome = () => {
@@ -175,26 +209,25 @@ export function App() {
     );
   }
 
-  if (screen === "playing") {
-    const questions = getCurrentQuestions();
-    const q = questions[questionIndex];
-    if (!q) return null;
+  const questions = getCurrentQuestions();
+  const q = questions[questionIndex];
+  const totalQs = mode === "cert" ? 10 : questions.length;
+  const isLast =
+    (mode === "cert" && questionIndex + 1 >= 10) ||
+    (mode === "stage" && questionIndex + 1 >= questions.length);
 
-    const totalQs = mode === "cert" ? 10 : questions.length;
-    const isLast =
-      (mode === "cert" && questionIndex + 1 >= 10) ||
-      (mode === "stage" && questionIndex + 1 >= questions.length);
-
+  if (screen === "playing" && q) {
     return (
       <PlayingScreen
         question={q}
         questionIndex={questionIndex}
         totalQs={totalQs}
         timeLeft={timeLeft}
+        answerTimerActive={answerTimerActive}
+        setupComplete={setupComplete}
+        onSetupComplete={handleSetupComplete}
         userInput={userInput}
         onInputChange={setUserInput}
-        showHint={showHint}
-        onToggleHint={() => setShowHint((v) => !v)}
         showScoring={showScoring}
         feedback={feedback}
         animatedScore={animatedScore}
@@ -204,6 +237,19 @@ export function App() {
         voice={voice}
         onHome={handleHome}
         onSubmit={() => void handleSubmit()}
+        onContinueToReveal={handleContinueToReveal}
+        onNext={handleNext}
+      />
+    );
+  }
+
+  if (screen === "reveal" && q && feedback) {
+    return (
+      <RevealScreen
+        question={q}
+        feedback={feedback}
+        isLast={isLast}
+        onHome={handleHome}
         onNext={handleNext}
       />
     );

@@ -1,3 +1,5 @@
+import type { QuestionMedia } from "./question-media.js";
+
 export type Question = {
   id: string;
   stageKey: string;
@@ -7,6 +9,8 @@ export type Question = {
   role: string;
   icon: string;
   hints: string[];
+  /** 設定時は動画お題 UI（字幕は YouTube CC） */
+  media?: QuestionMedia;
 };
 
 export function countWords(text: string): number {

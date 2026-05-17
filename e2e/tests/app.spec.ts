@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__E2E_BYPASS_YOUTUBE__ = true;
+  });
+
   await page.route("**/api/score", async (route) => {
     await route.fulfill({
       status: 200,
@@ -40,4 +44,24 @@ test("ステージモードで1問回答して採点結果が表示される", a
 
   await expect(page.getByText("AI採点結果")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("80")).toBeVisible();
+});
+
+test("動画お題で続きを見る→Part2視聴後に次へ進める", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "はじめる" }).click();
+  await page.getByRole("button", { name: "ステージモード" }).click();
+  await page.getByRole("button", { name: /初級/ }).click();
+
+  await page.getByPlaceholder(/英語で入力/).fill("I'd like a tall iced latte please");
+  await page.getByRole("button", { name: "回答する" }).click();
+  await expect(page.getByText("AI採点結果")).toBeVisible({ timeout: 15_000 });
+
+  await page.getByRole("button", { name: "続きを見る" }).click();
+  await expect(page.getByText("続き・模範・解説")).toBeVisible();
+
+  await expect(page.getByRole("button", { name: "次の問題へ" })).toBeDisabled();
+  await expect(page.getByText("視聴完了！次に進めます")).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("button", { name: "次の問題へ" }).click();
+
+  await expect(page.getByText("第2問")).toBeVisible();
 });

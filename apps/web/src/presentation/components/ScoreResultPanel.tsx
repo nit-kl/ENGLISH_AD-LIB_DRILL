@@ -1,4 +1,4 @@
-import { BookOpen, ChevronRight, Flame, Sparkles, Trophy } from "lucide-react";
+import { BookOpen, ChevronRight, Flame, Play, Sparkles, Trophy } from "lucide-react";
 import type { ScoreFeedback } from "@english-adlib/domain";
 import { SparkleField } from "./SparkleField";
 
@@ -7,9 +7,16 @@ type Props = {
   animatedScore: number;
   nextLabel: string;
   onNext: () => void;
+  hideModelAnswer?: boolean;
 };
 
-export function ScoreResultPanel({ feedback, animatedScore, nextLabel, onNext }: Props) {
+export function ScoreResultPanel({
+  feedback,
+  animatedScore,
+  nextLabel,
+  onNext,
+  hideModelAnswer = false,
+}: Props) {
   const axes = [
     { label: "流暢さ", val: feedback.fluency, icon: "💬" },
     { label: "文法", val: feedback.grammar, icon: "✏️" },
@@ -79,14 +86,22 @@ export function ScoreResultPanel({ feedback, animatedScore, nextLabel, onNext }:
           </ul>
         </div>
 
-        <div className="bg-black/40 rounded-2xl p-4 mb-6 border border-white/10">
-          <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2 flex items-center gap-2">
-            <BookOpen className="w-3 h-3" /> 模範解答の例
+        {!hideModelAnswer && (
+          <div className="bg-black/40 rounded-2xl p-4 mb-6 border border-white/10">
+            <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2 flex items-center gap-2">
+              <BookOpen className="w-3 h-3" /> 模範解答の例
+            </div>
+            <p className="text-white text-sm italic leading-relaxed">
+              &ldquo;{feedback.modelAnswer}&rdquo;
+            </p>
           </div>
-          <p className="text-white text-sm italic leading-relaxed">
-            &ldquo;{feedback.modelAnswer}&rdquo;
+        )}
+
+        {hideModelAnswer && (
+          <p className="text-center text-purple-200/80 text-sm mb-6">
+            続きの動画で模範解答と解説を確認できます
           </p>
-        </div>
+        )}
 
         <button
           type="button"
@@ -94,7 +109,9 @@ export function ScoreResultPanel({ feedback, animatedScore, nextLabel, onNext }:
           className="w-full py-4 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2"
         >
           {nextLabel}
-          {nextLabel.includes("結果") ? (
+          {hideModelAnswer ? (
+            <Play className="w-5 h-5" />
+          ) : nextLabel.includes("結果") ? (
             <Trophy className="w-5 h-5" />
           ) : (
             <ChevronRight className="w-5 h-5" />
