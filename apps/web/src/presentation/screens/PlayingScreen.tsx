@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Home, Mic, MicOff, Send } from "lucide-react";
+import { ChevronRight, Home, Mic, MicOff, Send } from "lucide-react";
 import { countWords, hasQuestionMedia, type Question, type ScoreFeedback } from "@english-adlib/domain";
 import type { ApiClientError } from "../../infrastructure/api-client";
 import { ScoreResultPanel } from "../components/ScoreResultPanel";
@@ -15,6 +15,8 @@ type Props = {
   question: Question;
   questionIndex: number;
   totalQs: number;
+  pickMode?: boolean;
+  finishLabel: string;
   timeLeft: number;
   answerTimerActive: boolean;
   setupComplete: boolean;
@@ -26,9 +28,9 @@ type Props = {
   animatedScore: number;
   isSubmitting: boolean;
   submitError: ApiClientError | null;
-  isLast: boolean;
   voice: Voice;
   onHome: () => void;
+  onBackToList?: () => void;
   onSubmit: () => void;
   onContinueToReveal: () => void;
   onNext: () => void;
@@ -38,6 +40,8 @@ export function PlayingScreen({
   question: q,
   questionIndex,
   totalQs,
+  pickMode = false,
+  finishLabel,
   timeLeft,
   answerTimerActive,
   setupComplete,
@@ -49,9 +53,9 @@ export function PlayingScreen({
   animatedScore,
   isSubmitting,
   submitError,
-  isLast,
   voice,
   onHome,
+  onBackToList,
   onSubmit,
   onContinueToReveal,
   onNext,
@@ -64,8 +68,7 @@ export function PlayingScreen({
     onSetupComplete();
   }, [onSetupComplete]);
 
-  const nextLabel = isLast ? "結果を見る" : "次の問題へ";
-  const scoringNextLabel = videoMode ? "続きを見る" : nextLabel;
+  const scoringNextLabel = videoMode ? "続きを見る" : finishLabel;
   const scoringNext = videoMode ? onContinueToReveal : onNext;
 
   return (
@@ -75,13 +78,32 @@ export function PlayingScreen({
     >
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <button type="button" onClick={onHome} className="flex items-center gap-2 text-purple-200 hover:text-white transition">
-            <Home className="w-5 h-5" />
-          </button>
+          {onBackToList ? (
+            <button
+              type="button"
+              onClick={onBackToList}
+              className="flex items-center gap-2 text-purple-200 hover:text-white text-sm transition"
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" />
+              お題一覧
+            </button>
+          ) : (
+            <button type="button" onClick={onHome} className="flex items-center gap-2 text-purple-200 hover:text-white transition">
+              <Home className="w-5 h-5" />
+            </button>
+          )}
           <div className="flex gap-2 md:gap-3">
-            <div className="px-3 md:px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-sm">
-              <span className="text-yellow-300 font-bold">第{questionIndex + 1}問</span>
-              <span className="text-purple-200"> / 全{totalQs}問</span>
+            <div className="px-3 md:px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-sm max-w-[min(100%,14rem)]">
+              {pickMode ? (
+                <span className="text-yellow-300 font-bold truncate block">
+                  {q.icon} {q.title}
+                </span>
+              ) : (
+                <>
+                  <span className="text-yellow-300 font-bold">第{questionIndex + 1}問</span>
+                  <span className="text-purple-200"> / 全{totalQs}問</span>
+                </>
+              )}
             </div>
             {timerVisible && (
               <div
@@ -113,9 +135,6 @@ export function PlayingScreen({
               mode="setup"
               onSetupComplete={handleSetupComplete}
             />
-            {!setupComplete && (
-              <p className="text-center text-purple-200/70 text-sm mt-3">字幕は動画の CC をご利用ください</p>
-            )}
           </div>
         )}
 

@@ -8,8 +8,9 @@ const sans = { fontFamily: '"Noto Sans JP", sans-serif' } as const;
 type Props = {
   question: Question;
   feedback: ScoreFeedback;
-  isLast: boolean;
+  finishLabel: string;
   onHome: () => void;
+  onBackToList?: () => void;
   onNext: () => void;
 };
 
@@ -21,7 +22,7 @@ function youtubeWatchUrl(videoId: string, startSeconds?: number): string {
   return base;
 }
 
-export function RevealScreen({ question, feedback, isLast, onHome, onNext }: Props) {
+export function RevealScreen({ question, feedback, finishLabel, onHome, onBackToList, onNext }: Props) {
   const [revealComplete, setRevealComplete] = useState(false);
 
   const onRevealComplete = useCallback(() => {
@@ -33,8 +34,6 @@ export function RevealScreen({ question, feedback, isLast, onHome, onNext }: Pro
   }
 
   const { reveal } = question.media;
-  const nextLabel = isLast ? "結果を見る" : "次の問題へ";
-
   return (
     <div
       className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 p-4 md:p-6 relative overflow-hidden"
@@ -42,13 +41,24 @@ export function RevealScreen({ question, feedback, isLast, onHome, onNext }: Pro
     >
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <button
-            type="button"
-            onClick={onHome}
-            className="flex items-center gap-2 text-purple-200 hover:text-white transition"
-          >
-            <Home className="w-5 h-5" />
-          </button>
+          {onBackToList ? (
+            <button
+              type="button"
+              onClick={onBackToList}
+              className="flex items-center gap-2 text-purple-200 hover:text-white text-sm transition"
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" />
+              お題一覧
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onHome}
+              className="flex items-center gap-2 text-purple-200 hover:text-white transition"
+            >
+              <Home className="w-5 h-5" />
+            </button>
+          )}
           <span className="text-xs font-bold tracking-widest text-yellow-300">続き・模範・解説</span>
         </div>
 
@@ -60,9 +70,7 @@ export function RevealScreen({ question, feedback, isLast, onHome, onNext }: Pro
         />
 
         <p className="text-center text-purple-200/80 text-sm mb-4">
-          {revealComplete
-            ? "視聴完了！次に進めます"
-            : "最後まで視聴すると次に進めます（字幕は動画の CC）"}
+          {revealComplete ? "視聴完了！次に進めます" : "最後まで視聴すると次に進めます"}
         </p>
 
         {revealComplete && (
@@ -90,8 +98,12 @@ export function RevealScreen({ question, feedback, isLast, onHome, onNext }: Pro
           disabled={!revealComplete}
           className="w-full py-4 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:hover:scale-100"
         >
-          {nextLabel}
-          {isLast ? <Trophy className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+          {finishLabel}
+          {finishLabel === "結果を見る" ? (
+            <Trophy className="w-5 h-5" />
+          ) : (
+            <ChevronRight className="w-5 h-5" />
+          )}
         </button>
       </div>
     </div>

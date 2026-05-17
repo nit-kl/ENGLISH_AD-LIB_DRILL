@@ -14,10 +14,19 @@ import { ModeSelectScreen } from "./screens/ModeSelectScreen";
 import { PlayingScreen } from "./screens/PlayingScreen";
 import { RevealScreen } from "./screens/RevealScreen";
 import { ResultScreen } from "./screens/ResultScreen";
+import { QuestionListScreen } from "./screens/QuestionListScreen";
 import { StageSelectScreen } from "./screens/StageSelectScreen";
 import { TitleScreen } from "./screens/TitleScreen";
 
-type Screen = "title" | "modeSelect" | "stageSelect" | "playing" | "reveal" | "result" | "certResult";
+type Screen =
+  | "title"
+  | "modeSelect"
+  | "stageSelect"
+  | "questionList"
+  | "playing"
+  | "reveal"
+  | "result"
+  | "certResult";
 type Mode = "cert" | "stage";
 
 function initialSetupComplete(question: Question | undefined): boolean {
@@ -40,6 +49,7 @@ export function App() {
   const [submitError, setSubmitError] = useState<ApiClientError | null>(null);
   const [setupComplete, setSetupComplete] = useState(false);
   const [answerTimerActive, setAnswerTimerActive] = useState(false);
+  const [stageCompletedIds, setStageCompletedIds] = useState<Set<string>>(() => new Set());
 
   const appendTranscript = useCallback((text: string) => {
     setUserInput((prev) => (prev ? `${prev} ${text}` : text));
@@ -149,11 +159,36 @@ export function App() {
     setMode("stage");
     setCurrentStage(key);
     setQuestionIndex(0);
-    resetPlayState(STAGES[key].questions[0]);
+    resetPlayState();
+    setScreen("questionList");
+  };
+
+  const handleSelectQuestion = (index: number) => {
+    if (!currentStage) return;
+    const q = STAGES[currentStage].questions[index];
+    if (!q) return;
+    setQuestionIndex(index);
+    resetPlayState(q);
     setScreen("playing");
   };
 
+  const handleReturnToQuestionList = (markCurrentComplete = true) => {
+    const questions = getCurrentQuestions();
+    const q = questions[questionIndex];
+    if (markCurrentComplete && q) {
+      setStageCompletedIds((prev) => new Set(prev).add(q.id));
+    }
+    setShowScoring(false);
+    resetPlayState();
+    setScreen("questionList");
+  };
+
   const handleNext = () => {
+    if (mode === "stage") {
+      handleReturnToQuestionList();
+      return;
+    }
+
     const questions = getCurrentQuestions();
     if (mode === "cert" && score !== null) {
       const newScores = [...certScores, score];
@@ -164,10 +199,6 @@ export function App() {
         return;
       }
       setQuestionIndex(questionIndex + 1);
-    } else if (questionIndex + 1 >= questions.length) {
-      setShowScoring(false);
-      setScreen("result");
-      return;
     } else {
       setQuestionIndex(questionIndex + 1);
     }
@@ -186,6 +217,7 @@ export function App() {
     setCurrentStage(null);
     setQuestionIndex(0);
     setCertScores([]);
+    setStageCompletedIds(new Set());
     resetPlayState();
   };
 
@@ -209,12 +241,24 @@ export function App() {
     );
   }
 
+  if (screen === "questionList" && currentStage) {
+    return (
+      <QuestionListScreen
+        stageKey={currentStage}
+        completedIds={stageCompletedIds}
+        onBack={() => setScreen("stageSelect")}
+        onHome={handleHome}
+        onSelect={(_q, index) => handleSelectQuestion(index)}
+      />
+    );
+  }
+
   const questions = getCurrentQuestions();
+  const stagePickMode = mode === "stage";
   const q = questions[questionIndex];
   const totalQs = mode === "cert" ? 10 : questions.length;
-  const isLast =
-    (mode === "cert" && questionIndex + 1 >= 10) ||
-    (mode === "stage" && questionIndex + 1 >= questions.length);
+  const isLast = mode === "cert" && questionIndex + 1 >= 10;
+  const finishLabel = stagePickMode ? "一覧に戻る" : isLast ? "結果を見る" : "次の問題へ";
 
   if (screen === "playing" && q) {
     return (
@@ -222,6 +266,8 @@ export function App() {
         question={q}
         questionIndex={questionIndex}
         totalQs={totalQs}
+        pickMode={stagePickMode}
+        finishLabel={finishLabel}
         timeLeft={timeLeft}
         answerTimerActive={answerTimerActive}
         setupComplete={setupComplete}
@@ -233,9 +279,9 @@ export function App() {
         animatedScore={animatedScore}
         isSubmitting={isSubmitting}
         submitError={submitError}
-        isLast={isLast}
         voice={voice}
         onHome={handleHome}
+        onBackToList={stagePickMode ? () => handleReturnToQuestionList(false) : undefined}
         onSubmit={() => void handleSubmit()}
         onContinueToReveal={handleContinueToReveal}
         onNext={handleNext}
@@ -248,8 +294,9 @@ export function App() {
       <RevealScreen
         question={q}
         feedback={feedback}
-        isLast={isLast}
+        finishLabel={finishLabel}
         onHome={handleHome}
+        onBackToList={stagePickMode ? () => handleReturnToQuestionList(true) : undefined}
         onNext={handleNext}
       />
     );

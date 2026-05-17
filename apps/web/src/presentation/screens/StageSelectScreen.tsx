@@ -46,7 +46,7 @@ export function StageSelectScreen({ onBack, onSelect }: Props) {
                 {stage.desc} · 全{stage.questions.length}問
               </p>
               <div className="flex items-center gap-2 text-white font-bold text-sm">
-                挑戦する <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                お題一覧へ <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />
               </div>
             </button>
           ))}

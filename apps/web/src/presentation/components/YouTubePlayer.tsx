@@ -12,11 +12,25 @@ type Props = {
   className?: string;
 };
 
+function disableYouTubeCaptions(player: YT.Player): void {
+  try {
+    player.unloadModule?.("captions");
+  } catch {
+    // ignore — API 未対応環境
+  }
+  try {
+    player.setOption?.("captions", "track", {});
+  } catch {
+    // ignore
+  }
+}
+
 function buildPlayerVars(segment: QuestionVideoSegment): Record<string, string | number> {
   const vars: Record<string, string | number> = {
     rel: 0,
     modestbranding: 1,
-    cc_load_policy: 1,
+    cc_load_policy: 0,
+    iv_load_policy: 3,
     playsinline: 1,
   };
   if (segment.startSeconds != null && segment.startSeconds > 0) {
@@ -70,6 +84,8 @@ export function YouTubePlayer({
         playerVars: buildPlayerVars(segment),
         events: {
           onReady: (event) => {
+            disableYouTubeCaptions(event.target);
+
             if (segment.startSeconds != null && segment.startSeconds > 0) {
               event.target.seekTo(segment.startSeconds, true);
             }

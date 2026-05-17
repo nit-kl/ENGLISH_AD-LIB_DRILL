@@ -28,6 +28,8 @@ declare namespace YT {
     seekTo(seconds: number, allowSeekAhead: boolean): void;
     getCurrentTime(): number;
     getPlayerState(): number;
+    unloadModule?(moduleName: string): void;
+    setOption?(module: string, option: string, value: unknown): void;
   }
 }
 
