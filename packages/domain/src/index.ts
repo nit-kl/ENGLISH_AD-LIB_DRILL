@@ -5,6 +5,14 @@ export {
   type QuestionVideoSegment,
 } from "./entities/question-media.js";
 export { parseScoreFeedback, type ScoreFeedback } from "./entities/score-feedback.js";
+export { extractJsonFromLlmText } from "./lib/extract-llm-json.js";
+export {
+  containsJapanese,
+  getSceneReplyFallback,
+  isValidSceneReply,
+  normalizeSceneReply,
+} from "./lib/scene-reply.js";
+export { applyScoreFloor } from "./lib/score-adjustment.js";
 export {
   type ScoreAnswerInput,
   type ScoringService,

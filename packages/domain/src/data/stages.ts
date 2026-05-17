@@ -27,6 +27,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           'ニューヨークのスターバックスにいます。店員さんに "What can I get for you today?" と聞かれました。アイスラテをトールサイズで注文してください。',
         role: "お客さん",
+        counterpart: "店員さん",
         icon: "☕",
         hints: ["I'd like ~", "Can I have ~", "a tall iced latte"],
         // https://youtu.be/ii50mPdVdhk — Part2 開始 15s（YouTube 実測）
@@ -49,6 +50,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           '語学学校の初日。隣に座った人が "Hi! I don\'t think we\'ve met. I\'m Sarah." と話しかけてきました。自己紹介してください。',
         role: "留学生",
+        counterpart: "Sarah",
         icon: "🎒",
         hints: ["Nice to meet you", "I'm from ~", "I'm here to ~"],
       },
@@ -60,6 +62,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           '渋谷駅前で外国人観光客に "Excuse me, how can I get to Shibuya Crossing?" と聞かれました。教えてあげてください。',
         role: "親切な日本人",
+        counterpart: "観光客",
         icon: "🗺️",
         hints: ["Go straight", "Turn left/right", "It's right over there"],
       },
@@ -80,6 +83,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "ハワイのホテルでチェックインしようとしたら、予約記録がないと言われました。冷静に状況を説明し、対応を求めてください。",
         role: "困っている宿泊客",
+        counterpart: "フロント係",
         icon: "🏨",
         hints: ["I have a reservation", "Could you check again", "This is unacceptable"],
       },
@@ -91,6 +95,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           '外資系企業の面接で "Tell me about a time you overcame a difficult challenge at work." と聞かれました。1分以内に答えてください。',
         role: "転職志望者",
+        counterpart: "面接官",
         icon: "💼",
         hints: ["In my previous role", "I was responsible for", "As a result"],
       },
@@ -102,6 +107,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           'リモート会議の前、海外支社の同僚が "How was your weekend?" と話しかけてきました。週末の出来事を話してください。',
         role: "会社員",
+        counterpart: "同僚",
         icon: "💬",
         hints: ["It was pretty good", "I ended up ~ing", "How about you?"],
       },
@@ -122,6 +128,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "国際カンファレンスで「日本の働き方改革」について発表します。聴衆を引き込む60秒のオープニングを話してください。",
         role: "登壇者",
+        counterpart: "司会",
         icon: "🎤",
         hints: ["Imagine a world where ~", "Today I want to talk about", "But first, let me ask you"],
       },
@@ -133,6 +140,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "外国人上司が「日本市場での研修予算を全額カットする」と提案。失礼にならない範囲で反対意見を述べてください。",
         role: "マネージャー",
+        counterpart: "上司",
         icon: "⚖️",
         hints: ["I understand your point, however", "With all due respect", "May I suggest an alternative"],
       },
@@ -144,6 +152,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           '怒っている海外のお客様 "This is the worst service I have ever received!" 丁寧に謝罪し、解決策を提示してください。',
         role: "カスタマーサポート",
+        counterpart: "お客様",
         icon: "🔥",
         hints: ["I sincerely apologize", "Let me make this right", "I completely understand your frustration"],
       },
@@ -164,6 +173,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "タイムスリップしてきた徳川家康に、英語でTwitter（X）とは何かを説明してください。家康にも分かるように。",
         role: "タイムトラベル案内人",
+        counterpart: "徳川家康",
         icon: "⚔️",
         hints: ["It's like a town square where ~", "Imagine a messenger that ~", "Everyone can hear what you say"],
       },
@@ -175,6 +185,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "国連気候変動会議で日本代表として60秒スピーチ。各国の即時行動を訴えてください。",
         role: "日本代表",
+        counterpart: "議長",
         icon: "🌏",
         hints: ["Distinguished delegates", "The time for action is now", "We owe it to future generations"],
       },
@@ -186,6 +197,7 @@ export const STAGES: Record<StageKey, Stage> = {
         situation:
           "砂漠の遊牧民に「プレミアム砂」を買わせてください。英語で説得力ある営業トークを。",
         role: "訪問販売員",
+        counterpart: "遊牧民",
         icon: "🏜️",
         hints: ["This isn't just any sand", "What makes this special is", "You'd be the first in your tribe to"],
       },

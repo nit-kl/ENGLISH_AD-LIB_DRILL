@@ -9,6 +9,7 @@ const sampleQuestion: Question = {
   titleEn: "Order at a Café",
   situation: "Order an iced latte.",
   role: "お客さん",
+  counterpart: "店員さん",
   icon: "☕",
   hints: ["I'd like ~"],
 };
@@ -21,6 +22,7 @@ class FakeScoringService implements ScoringService {
       grammar: 85,
       vocabulary: 78,
       relevance: 85,
+      reply: "Sure, one tall iced latte. Anything else for you today?",
       goodPoints: ["良いテンポ"],
       improvements: ["冠詞を意識"],
       modelAnswer: "I'd like a tall iced latte, please.",

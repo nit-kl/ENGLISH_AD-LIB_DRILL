@@ -16,6 +16,7 @@ test.beforeEach(async ({ page }) => {
           grammar: 82,
           vocabulary: 75,
           relevance: 85,
+          reply: "Sure, one tall iced latte. Would you like that for here or to go?",
           goodPoints: ["自然な流れ"],
           improvements: ["冠詞に注意"],
           modelAnswer: "I'd like a tall iced latte, please.",
@@ -44,6 +45,8 @@ test("1問回答して採点結果が表示される", async ({ page }) => {
 
   await expect(page.getByText("AI採点結果")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("80")).toBeVisible();
+  await expect(page.getByText("店員さん")).toBeVisible();
+  await expect(page.getByText(/tall iced latte/i)).toBeVisible();
 });
 
 test("動画お題で続きを見る→Part2視聴後に次へ進める", async ({ page }) => {

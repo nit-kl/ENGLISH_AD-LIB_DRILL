@@ -6,7 +6,10 @@ export type Question = {
   title: string;
   titleEn: string;
   situation: string;
+  /** 学習者が演じる役 */
   role: string;
+  /** 場面で学習者の相手（採点後チャットの返答者） */
+  counterpart: string;
   icon: string;
   hints: string[];
   /** 設定時は動画お題 UI（字幕は YouTube CC） */

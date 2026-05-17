@@ -1,4 +1,11 @@
-import type { Question, ScoreFeedback } from "@english-adlib/domain";
+import {
+  applyScoreFloor,
+  getQuestionById,
+  normalizeSceneReply,
+  parseScoreFeedback,
+  type Question,
+  type ScoreFeedback,
+} from "@english-adlib/domain";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -62,11 +69,29 @@ export async function scoreAnswer(
     body: JSON.stringify({ questionId, answerText }),
   });
   if (!res.ok) throw await parseApiError(res);
-  const data = (await res.json()) as { feedback?: ScoreFeedback };
-  if (!data.feedback) {
+  const data = (await res.json()) as { feedback?: unknown };
+  if (data.feedback == null) {
     throw new ApiClientError("Invalid scoring response", "SCORING_FAILED", 502, true);
   }
-  return data.feedback;
+  try {
+    const parsed = parseScoreFeedback(data.feedback);
+    const adjusted = applyScoreFloor(parsed, answerText);
+    const question = getQuestionById(questionId);
+    if (question) {
+      return {
+        ...adjusted,
+        reply: normalizeSceneReply(adjusted.reply, question),
+      };
+    }
+    return adjusted;
+  } catch {
+    throw new ApiClientError(
+      "採点結果の形式が正しくありません",
+      "SCORING_FAILED",
+      502,
+      true,
+    );
+  }
 }
 
 export async function transcribeAudio(blob: Blob): Promise<string> {

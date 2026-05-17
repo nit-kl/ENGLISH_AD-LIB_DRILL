@@ -203,6 +203,9 @@ export function PlayingScreen({
             <ScoreResultPanel
               feedback={feedback}
               animatedScore={animatedScore}
+              situation={q.situation}
+              userAnswer={userInput.trim() || "..."}
+              counterpartLabel={q.counterpart}
               nextLabel={scoringNextLabel}
               onNext={scoringNext}
               hideModelAnswer={videoMode}

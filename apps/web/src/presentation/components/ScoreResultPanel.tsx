@@ -1,10 +1,13 @@
-import { BookOpen, ChevronRight, Flame, Play, Sparkles, Trophy } from "lucide-react";
+import { ChevronRight, MessageCircle, Play, Trophy, User } from "lucide-react";
 import type { ScoreFeedback } from "@english-adlib/domain";
 import { SparkleField } from "./SparkleField";
 
 type Props = {
   feedback: ScoreFeedback;
   animatedScore: number;
+  situation: string;
+  userAnswer: string;
+  counterpartLabel: string;
   nextLabel: string;
   onNext: () => void;
   hideModelAnswer?: boolean;
@@ -13,25 +16,21 @@ type Props = {
 export function ScoreResultPanel({
   feedback,
   animatedScore,
+  situation,
+  userAnswer,
+  counterpartLabel,
   nextLabel,
   onNext,
   hideModelAnswer = false,
 }: Props) {
-  const axes = [
-    { label: "流暢さ", val: feedback.fluency, icon: "💬" },
-    { label: "文法", val: feedback.grammar, icon: "✏️" },
-    { label: "語彙", val: feedback.vocabulary, icon: "📚" },
-    { label: "適切さ", val: feedback.relevance, icon: "🎯" },
-  ] as const;
-
   return (
-    <div className="bg-gradient-to-br from-yellow-300/20 to-pink-500/20 backdrop-blur-xl rounded-3xl border-2 border-yellow-300/50 p-6 md:p-8 shadow-2xl relative overflow-hidden">
+    <div className="bg-gradient-to-br from-yellow-300/20 to-pink-500/20 backdrop-blur-xl rounded-3xl border-2 border-yellow-300/50 p-5 md:p-7 shadow-2xl relative overflow-hidden">
       <SparkleField count={8} />
-      <div className="relative z-10">
-        <div className="text-center mb-6">
-          <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2">AI採点結果</div>
+      <div className="relative z-10 flex flex-col min-h-[min(70vh,32rem)]">
+        <div className="text-center mb-4 shrink-0">
+          <div className="text-xs font-bold tracking-widest text-yellow-300 mb-1">AI採点結果</div>
           <div
-            className="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-200 to-amber-400"
+            className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-200 to-amber-400 leading-none"
             style={{ fontFamily: '"Noto Serif JP", serif' }}
           >
             {animatedScore}
@@ -39,66 +38,33 @@ export function ScoreResultPanel({
           <div className="text-purple-200 text-sm">/ 100点</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          {axes.map((item) => (
-            <div key={item.label} className="bg-black/30 rounded-xl p-3 border border-white/10">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-purple-200 text-xs font-bold">
-                  {item.icon} {item.label}
-                </span>
-                <span className="text-white font-black">{item.val}</span>
+        <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1 min-h-0">
+          <div className="flex justify-end gap-2">
+            <div className="max-w-[88%] rounded-2xl rounded-tr-sm bg-white/15 border border-white/20 px-4 py-3 shadow-lg">
+              <div className="flex items-center gap-1.5 text-purple-300 text-xs font-bold mb-2">
+                <User className="w-3.5 h-3.5" />
+                あなた
               </div>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-yellow-300 to-amber-400 transition-all duration-1000"
-                  style={{ width: `${item.val}%` }}
-                />
-              </div>
+              <div className="text-purple-200/90 text-xs font-bold mb-1">お題</div>
+              <p className="text-white text-sm leading-relaxed mb-3">{situation}</p>
+              <div className="text-purple-200/90 text-xs font-bold mb-1">回答</div>
+              <p className="text-white text-sm leading-relaxed italic">&ldquo;{userAnswer}&rdquo;</p>
             </div>
-          ))}
-        </div>
-
-        <div className="bg-emerald-500/15 border border-emerald-400/30 rounded-2xl p-4 mb-3">
-          <div className="text-xs font-bold tracking-widest text-emerald-300 mb-2 flex items-center gap-2">
-            <Sparkles className="w-3 h-3" /> 良かった点
           </div>
-          <ul className="space-y-1.5">
-            {feedback.goodPoints.map((c) => (
-              <li key={c} className="text-white text-sm flex gap-2 leading-relaxed">
-                <span className="text-emerald-300 shrink-0">◎</span>
-                <span>{c}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="bg-rose-500/15 border border-rose-400/30 rounded-2xl p-4 mb-3">
-          <div className="text-xs font-bold tracking-widest text-rose-300 mb-2 flex items-center gap-2">
-            <Flame className="w-3 h-3" /> ここを直すともっと伸びる
-          </div>
-          <ul className="space-y-1.5">
-            {feedback.improvements.map((c) => (
-              <li key={c} className="text-white text-sm flex gap-2 leading-relaxed">
-                <span className="text-rose-300 shrink-0">▲</span>
-                <span>{c}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {!hideModelAnswer && (
-          <div className="bg-black/40 rounded-2xl p-4 mb-6 border border-white/10">
-            <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2 flex items-center gap-2">
-              <BookOpen className="w-3 h-3" /> 模範解答の例
+          <div className="flex justify-start gap-2">
+            <div className="w-8 h-8 rounded-full bg-yellow-300/20 border border-yellow-300/40 flex items-center justify-center shrink-0 mt-1">
+              <MessageCircle className="w-4 h-4 text-yellow-300" />
             </div>
-            <p className="text-white text-sm italic leading-relaxed">
-              &ldquo;{feedback.modelAnswer}&rdquo;
-            </p>
+            <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-black/35 border border-yellow-300/25 px-4 py-3 shadow-lg">
+              <div className="text-yellow-300 text-xs font-bold mb-2">{counterpartLabel}</div>
+              <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{feedback.reply}</p>
+            </div>
           </div>
-        )}
+        </div>
 
         {hideModelAnswer && (
-          <p className="text-center text-purple-200/80 text-sm mb-6">
+          <p className="text-center text-purple-200/80 text-sm mb-4 shrink-0">
             続きの動画で模範解答と解説を確認できます
           </p>
         )}
@@ -106,7 +72,7 @@ export function ScoreResultPanel({
         <button
           type="button"
           onClick={onNext}
-          className="w-full py-4 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2"
+          className="w-full py-4 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2 shrink-0"
         >
           {nextLabel}
           {hideModelAnswer ? (
