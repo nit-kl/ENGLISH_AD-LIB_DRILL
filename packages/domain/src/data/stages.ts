@@ -53,6 +53,17 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "Sarah",
         icon: "🎒",
         hints: ["Nice to meet you", "I'm from ~", "I'm here to ~"],
+        // https://youtu.be/IurgHMDUExE — Part2 開始 26s（Hook なし・マニフェスト実測）
+        media: {
+          setup: {
+            youtubeVideoId: "IurgHMDUExE",
+            endSeconds: 25,
+          },
+          reveal: {
+            youtubeVideoId: "IurgHMDUExE",
+            startSeconds: 25,
+          },
+        },
       },
       {
         id: "beginner-3",
@@ -65,6 +76,17 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "観光客",
         icon: "🗺️",
         hints: ["Go straight", "Turn left/right", "It's right over there"],
+        // https://youtu.be/BmESAC8gpf0 — Part2 開始 31s（Hook なし・メタデータ推定 0:32 から -1s）
+        media: {
+          setup: {
+            youtubeVideoId: "BmESAC8gpf0",
+            endSeconds: 24,
+          },
+          reveal: {
+            youtubeVideoId: "BmESAC8gpf0",
+            startSeconds: 24,
+          },
+        },
       },
     ],
   },
