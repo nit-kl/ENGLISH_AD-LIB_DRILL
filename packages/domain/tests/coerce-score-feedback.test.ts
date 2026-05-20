@@ -8,7 +8,7 @@ const base = {
   grammar: "65",
   vocabulary: "68",
   relevance: "75",
-  reply: "Sure, one tall iced latte.",
+  sceneUpdateJa: "注文を受け取り、次の確認に進みます。",
   goodPoints: [],
   improvements: [],
   modelAnswer: "I'd like a tall iced latte, please.",

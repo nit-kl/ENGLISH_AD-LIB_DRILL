@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ChevronRight, ExternalLink, Home, Trophy } from "lucide-react";
+import { ChevronRight, ExternalLink, Home, BookOpen, Sparkles } from "lucide-react";
 import { hasQuestionMedia, type Question, type ScoreFeedback } from "@english-adlib/domain";
 import { YouTubePlayer } from "../components/YouTubePlayer";
 
@@ -59,9 +59,47 @@ export function RevealScreen({ question, feedback, finishLabel, onHome, onBackTo
               <Home className="w-5 h-5" />
             </button>
           )}
-          <span className="text-xs font-bold tracking-widest text-yellow-300">続き・模範・解説</span>
+          <span className="text-xs font-bold tracking-widest text-yellow-300">模範解答・解説</span>
         </div>
 
+        <div className="rounded-2xl bg-black/35 border border-emerald-400/25 px-4 py-3 mb-4">
+          <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold mb-2">
+            <Sparkles className="w-4 h-4" />
+            場面の変化（おさらい）
+          </div>
+          <p className="text-white text-sm leading-relaxed">{feedback.sceneUpdateJa}</p>
+        </div>
+
+        <div className="bg-black/40 rounded-2xl p-4 mb-4 border border-yellow-300/30">
+          <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-yellow-300 mb-2">
+            <BookOpen className="w-4 h-4" />
+            模範解答
+          </div>
+          <p className="text-white text-sm italic leading-relaxed">
+            &ldquo;{feedback.modelAnswer}&rdquo;
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 text-sm mb-4">
+          <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+            <div className="text-emerald-300 text-xs font-bold mb-1">良かった点</div>
+            <ul className="text-purple-100 space-y-1 list-disc list-inside">
+              {feedback.goodPoints.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+            <div className="text-amber-300 text-xs font-bold mb-1">改善ポイント</div>
+            <ul className="text-purple-100 space-y-1 list-disc list-inside">
+              {feedback.improvements.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="text-xs font-bold tracking-widest text-purple-200 mb-2">解説動画</div>
         <YouTubePlayer
           segment={reveal}
           mode="reveal"
@@ -70,17 +108,10 @@ export function RevealScreen({ question, feedback, finishLabel, onHome, onBackTo
         />
 
         <p className="text-center text-purple-200/80 text-sm mb-4">
-          {revealComplete ? "視聴完了！次に進めます" : "最後まで視聴すると次に進めます"}
+          {revealComplete
+            ? "視聴完了！次に進めます"
+            : "解説動画を最後まで視聴すると次に進めます"}
         </p>
-
-        {revealComplete && (
-          <div className="bg-black/40 rounded-2xl p-4 mb-4 border border-white/10">
-            <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2">模範解答の例</div>
-            <p className="text-white text-sm italic leading-relaxed">
-              &ldquo;{feedback.modelAnswer}&rdquo;
-            </p>
-          </div>
-        )}
 
         <a
           href={youtubeWatchUrl(reveal.youtubeVideoId, reveal.startSeconds)}
@@ -99,11 +130,7 @@ export function RevealScreen({ question, feedback, finishLabel, onHome, onBackTo
           className="w-full py-4 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:hover:scale-100"
         >
           {finishLabel}
-          {finishLabel === "結果を見る" ? (
-            <Trophy className="w-5 h-5" />
-          ) : (
-            <ChevronRight className="w-5 h-5" />
-          )}
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>

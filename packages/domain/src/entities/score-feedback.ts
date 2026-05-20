@@ -4,8 +4,10 @@ export type ScoreFeedback = {
   grammar: number;
   vocabulary: number;
   relevance: number;
-  /** 採点画面に表示する、場面の相手からの英語返答（ロールプレイの続き） */
-  reply: string;
+  /** 学習者の回答によって場面がどう変わったか（日本語） */
+  sceneUpdateJa: string;
+  /** @deprecated UI 非表示。互換用にパースのみ残す */
+  reply?: string;
   goodPoints: string[];
   improvements: string[];
   modelAnswer: string;
@@ -17,12 +19,18 @@ function assertScoreInRange(value: unknown, field: string): asserts value is num
   }
 }
 
-function resolveReply(data: Record<string, unknown>): string {
+function resolveSceneUpdateJa(data: Record<string, unknown>): string {
+  if (typeof data.sceneUpdateJa === "string" && data.sceneUpdateJa.trim().length > 0) {
+    return data.sceneUpdateJa.trim();
+  }
+  throw new Error("sceneUpdateJa must be a non-empty string");
+}
+
+function resolveOptionalReply(data: Record<string, unknown>): string | undefined {
   if (typeof data.reply === "string" && data.reply.trim().length > 0) {
     return data.reply.trim();
   }
-
-  throw new Error("reply must be a non-empty string");
+  return undefined;
 }
 
 function assertStringArray(value: unknown, field: string): asserts value is string[] {
@@ -49,7 +57,8 @@ export function parseScoreFeedback(raw: unknown): ScoreFeedback {
   assertStringArray(data.goodPoints, "goodPoints");
   assertStringArray(data.improvements, "improvements");
 
-  const reply = resolveReply(data);
+  const sceneUpdateJa = resolveSceneUpdateJa(data);
+  const reply = resolveOptionalReply(data);
 
   if (typeof data.modelAnswer !== "string" || data.modelAnswer.trim().length === 0) {
     throw new Error("modelAnswer must be a non-empty string");
@@ -61,7 +70,8 @@ export function parseScoreFeedback(raw: unknown): ScoreFeedback {
     grammar: data.grammar,
     vocabulary: data.vocabulary,
     relevance: data.relevance,
-    reply,
+    sceneUpdateJa,
+    ...(reply !== undefined ? { reply } : {}),
     goodPoints: data.goodPoints,
     improvements: data.improvements,
     modelAnswer: data.modelAnswer.trim(),

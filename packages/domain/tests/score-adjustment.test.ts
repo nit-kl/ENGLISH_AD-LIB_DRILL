@@ -8,7 +8,7 @@ const zeroFeedback: ScoreFeedback = {
   grammar: 0,
   vocabulary: 0,
   relevance: 0,
-  reply: "Sure, one tall iced latte.",
+  sceneUpdateJa: "店員が注文を受け取りました。",
   goodPoints: ["意図は伝わる"],
   improvements: ["冠詞"],
   modelAnswer: "I'd like a tall iced latte, please.",

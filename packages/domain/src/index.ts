@@ -8,6 +8,12 @@ export { parseScoreFeedback, type ScoreFeedback } from "./entities/score-feedbac
 export { extractJsonFromLlmText } from "./lib/extract-llm-json.js";
 export { coerceScoreFeedbackRaw } from "./lib/coerce-score-feedback.js";
 export {
+  buildSceneUpdateFallback,
+  getSceneUpdateFallback,
+  resolveSceneUpdateJa,
+} from "./lib/scene-update-fallback.js";
+export { looksLikeSetupRepeat } from "./lib/scene-update-quality.js";
+export {
   containsJapanese,
   getSceneReplyFallback,
   isValidSceneReply,

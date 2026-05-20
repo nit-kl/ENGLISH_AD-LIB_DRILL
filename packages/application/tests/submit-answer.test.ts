@@ -22,7 +22,7 @@ class FakeScoringService implements ScoringService {
       grammar: 85,
       vocabulary: 78,
       relevance: 85,
-      reply: "Sure, one tall iced latte. Anything else for you today?",
+      sceneUpdateJa: "店員が注文を受け取り、次の質問に進みます。",
       goodPoints: ["良いテンポ"],
       improvements: ["冠詞を意識"],
       modelAnswer: "I'd like a tall iced latte, please.",

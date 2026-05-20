@@ -3,8 +3,9 @@ import {
   applyScoreFloor,
   coerceScoreFeedbackRaw,
   extractJsonFromLlmText,
-  normalizeSceneReply,
+  looksLikeSetupRepeat,
   parseScoreFeedback,
+  resolveSceneUpdateJa,
 } from "@english-adlib/domain";
 
 export type AiBinding = {
@@ -19,9 +20,9 @@ const JSON_SCHEMA = `{
   "grammar": number 0-100,
   "vocabulary": number 0-100,
   "relevance": number 0-100,
-  "reply": string (see REPLY RULES below),
-  "goodPoints": string[] (1-3 items, Japanese, for scoring only—not shown as reply),
-  "improvements": string[] (1-3 items, Japanese, for scoring only),
+  "sceneUpdateJa": string (REQUIRED: Japanese only, 2-4 sentences),
+  "goodPoints": string[] (1-3 items, Japanese),
+  "improvements": string[] (1-3 items, Japanese),
   "modelAnswer": string (English example of what the LEARNER could say)
 }`;
 
@@ -29,42 +30,48 @@ function buildSystemPrompt(question: Question): string {
   return `You score English role-play answers for Japanese learners.
 
 LEARNER plays: ${question.role}
-REPLY CHARACTER (write "reply" as this person only): ${question.counterpart}
+Scene counterpart: ${question.counterpart}
 
-REPLY RULES for "reply":
-- MUST be ENGLISH ONLY (no Japanese characters in "reply")
-- 1-2 short sentences from ${question.counterpart} continuing the scene AFTER the learner spoke
-- Confirm what you understood, then one brief follow-up if natural (e.g. for here or to go)
-- Interpret intent even if grammar is wrong; fix their wording silently—do NOT echo mistakes
-- Do NOT speak as the learner (${question.role})
-- Do NOT coach, grade, or use Japanese in "reply"
-- goodPoints/improvements are Japanese for internal scoring only—never put them in "reply"
+sceneUpdateJa RULES (most important for the learner):
+- Write ONLY in Japanese (no English in sceneUpdateJa)
+- Describe ONLY what happened AFTER "Learner said" — the NEW state of the scene
+- MUST mention something from the learner's answer (name, country, order, direction, etc.)
+- Describe ${question.counterpart}'s reaction and the NEXT step in the conversation
+- FORBIDDEN: copying "Situation (before learner spoke)" text, quoting the opening line, or ending with "〜してください" (that is the task instruction, not the update)
+- FORBIDDEN: narrating how ${question.counterpart} first approached the learner if the learner already replied
+- Do NOT list grammar scores or coaching in sceneUpdateJa
 
 SCORING: Never give total 0 if the learner attempted on-topic English. Minor grammar mistakes should still score roughly 40-70. Reserve below 20 for empty or completely off-topic answers.
 
-${sceneReplyExample(question)}
+${sceneUpdateExample(question)}
 
 Respond with ONLY valid JSON (no markdown, no text before or after) using this schema:
 ${JSON_SCHEMA}`;
 }
 
-function sceneReplyExample(question: Question): string {
+function sceneUpdateExample(question: Question): string {
   if (question.id === "beginner-1") {
-    return `EXAMPLE:
-Learner said: "I'd like to tall latte"
-reply: "Sure, one tall iced latte. Would you like that for here or to go?"`;
+    return `GOOD sceneUpdateJa for "I'd like a small hot coffee":
+「スモールのホットコーヒー」を注文したと受け止められ、店員は受け取りました。次は店内かテイクアウトかを聞かれる段階です。
+BAD (never): restating the café greeting or "注文してください".`;
   }
-  return `EXAMPLE reply style: short English from ${question.counterpart}, not Japanese.`;
+  if (question.id === "beginner-2") {
+    return `GOOD for "Nice to meet you. I'm Leo, I'm from Japan.":
+レオさんが日本から来て留学中だと自己紹介したので、サラは笑顔でうなずき、学校や英語学習の話を続ける場面に進みました。
+BAD (never): 「サラが Hi と話しかけてきました。自己紹介してください。」— that is BEFORE the learner spoke.`;
+  }
+  return `GOOD sceneUpdateJa must change when the learner's line changes. BAD: repeating the situation field.`;
 }
 
 function buildUserPrompt(question: Question, answerText: string): string {
   return [
     `Title: ${question.title} (${question.titleEn})`,
     `Learner role: ${question.role}`,
-    `Reply as: ${question.counterpart}`,
-    `Situation: ${question.situation}`,
+    `Counterpart: ${question.counterpart}`,
+    `Situation (before learner spoke): ${question.situation}`,
     `Hints (optional expressions): ${question.hints.join(", ")}`,
     `Learner said: ${answerText}`,
+    `Write sceneUpdateJa describing the situation AFTER this line.`,
   ].join("\n");
 }
 
@@ -75,16 +82,33 @@ function isRetryableScoringFailure(message: string): boolean {
     lower.includes("parse") ||
     lower.includes("syntax") ||
     lower.includes("empty response") ||
-    lower.includes("reply must") ||
+    lower.includes("sceneupdateja") ||
     lower.includes("must be") ||
-    lower.includes("incomplete")
+    lower.includes("incomplete") ||
+    lower.includes("setup repeat")
   );
+}
+
+function applySceneUpdateJa(
+  feedback: ScoreFeedback,
+  question: Question,
+  answerText: string,
+): ScoreFeedback {
+  return {
+    ...feedback,
+    sceneUpdateJa: resolveSceneUpdateJa(
+      feedback.sceneUpdateJa,
+      question,
+      answerText,
+    ),
+  };
 }
 
 function parseWorkersAiResponse(
   result: unknown,
   question: Question,
   answerText: string,
+  attempt: number,
 ): ScoreFeedback {
   const payload = result as { response?: unknown };
   const response = payload.response;
@@ -106,10 +130,13 @@ function parseWorkersAiResponse(
 
   const parsed = parseScoreFeedback(coerceScoreFeedbackRaw(raw));
   const adjusted = applyScoreFloor(parsed, answerText);
-  return {
-    ...adjusted,
-    reply: normalizeSceneReply(adjusted.reply, question),
-  };
+  if (
+    looksLikeSetupRepeat(adjusted.sceneUpdateJa, question) &&
+    attempt < MAX_ATTEMPTS
+  ) {
+    throw new Error("sceneUpdateJa looks like setup repeat");
+  }
+  return applySceneUpdateJa(adjusted, question, answerText);
 }
 
 export class WorkersAiScoringService implements ScoringService {
@@ -139,7 +166,12 @@ export class WorkersAiScoringService implements ScoringService {
           max_tokens: 700,
           temperature: attempt === 1 ? 0.35 : 0.15,
         });
-        return parseWorkersAiResponse(result, input.question, input.answerText);
+        return parseWorkersAiResponse(
+          result,
+          input.question,
+          input.answerText,
+          attempt,
+        );
       } catch (error) {
         lastError = error;
         const message = error instanceof Error ? error.message : "Scoring failed";

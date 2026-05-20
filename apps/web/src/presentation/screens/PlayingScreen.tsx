@@ -68,7 +68,7 @@ export function PlayingScreen({
     onSetupComplete();
   }, [onSetupComplete]);
 
-  const scoringNextLabel = videoMode ? "続きを見る" : finishLabel;
+  const scoringNextLabel = videoMode ? "模範解答と解説を見る" : finishLabel;
   const scoringNext = videoMode ? onContinueToReveal : onNext;
 
   return (
@@ -208,12 +208,10 @@ export function PlayingScreen({
             <ScoreResultPanel
               feedback={feedback}
               animatedScore={animatedScore}
-              situation={q.situation}
               userAnswer={userInput.trim() || "..."}
-              counterpartLabel={q.counterpart}
               nextLabel={scoringNextLabel}
               onNext={scoringNext}
-              hideModelAnswer={videoMode}
+              deferModelAndTips={videoMode}
             />
           )
         )}

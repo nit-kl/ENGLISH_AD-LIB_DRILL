@@ -39,6 +39,9 @@ export function coerceScoreFeedbackRaw(raw: unknown): unknown {
   data.goodPoints = toStringArray(data.goodPoints, DEFAULT_GOOD_POINTS);
   data.improvements = toStringArray(data.improvements, DEFAULT_IMPROVEMENTS);
 
+  if (typeof data.sceneUpdateJa === "string") {
+    data.sceneUpdateJa = data.sceneUpdateJa.trim();
+  }
   if (typeof data.reply === "string") {
     data.reply = data.reply.trim();
   }

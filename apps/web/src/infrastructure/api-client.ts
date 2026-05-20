@@ -1,8 +1,8 @@
 import {
   applyScoreFloor,
   getQuestionById,
-  normalizeSceneReply,
   parseScoreFeedback,
+  resolveSceneUpdateJa,
   type Question,
   type ScoreFeedback,
 } from "@english-adlib/domain";
@@ -87,7 +87,11 @@ async function scoreAnswerOnce(
     if (question) {
       return {
         ...adjusted,
-        reply: normalizeSceneReply(adjusted.reply, question),
+        sceneUpdateJa: resolveSceneUpdateJa(
+          adjusted.sceneUpdateJa,
+          question,
+          answerText,
+        ),
       };
     }
     return adjusted;

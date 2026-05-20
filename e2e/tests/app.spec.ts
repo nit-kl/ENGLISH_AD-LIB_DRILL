@@ -16,7 +16,8 @@ test.beforeEach(async ({ page }) => {
           grammar: 82,
           vocabulary: 75,
           relevance: 85,
-          reply: "Sure, one tall iced latte. Would you like that for here or to go?",
+          sceneUpdateJa:
+            "トールのアイスラテを注文したと受け止められ、店員が店内かお持ち帰りかを確認する段階に進みました。",
           goodPoints: ["自然な流れ"],
           improvements: ["冠詞に注意"],
           modelAnswer: "I'd like a tall iced latte, please.",
@@ -45,8 +46,8 @@ test("1問回答して採点結果が表示される", async ({ page }) => {
 
   await expect(page.getByText("AI採点結果")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("80")).toBeVisible();
-  await expect(page.getByText("店員さん")).toBeVisible();
-  await expect(page.getByText(/tall iced latte/i)).toBeVisible();
+  await expect(page.getByText("場面の変化")).toBeVisible();
+  await expect(page.getByText(/店内かお持ち帰り/)).toBeVisible();
 });
 
 test("動画お題で続きを見る→Part2視聴後に次へ進める", async ({ page }) => {
@@ -59,8 +60,9 @@ test("動画お題で続きを見る→Part2視聴後に次へ進める", async 
   await page.getByRole("button", { name: "回答する" }).click();
   await expect(page.getByText("AI採点結果")).toBeVisible({ timeout: 15_000 });
 
-  await page.getByRole("button", { name: "続きを見る" }).click();
-  await expect(page.getByText("続き・模範・解説")).toBeVisible();
+  await page.getByRole("button", { name: "模範解答と解説を見る" }).click();
+  await expect(page.getByText("模範解答・解説")).toBeVisible();
+  await expect(page.getByText("模範解答")).toBeVisible();
 
   await expect(page.getByRole("button", { name: "一覧に戻る" })).toBeDisabled();
   await expect(page.getByText("視聴完了！次に進めます")).toBeVisible({ timeout: 5_000 });

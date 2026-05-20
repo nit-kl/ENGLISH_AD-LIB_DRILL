@@ -13,7 +13,7 @@ describe("scoreAnswer", () => {
       grammar: 82,
       vocabulary: 75,
       relevance: 85,
-      reply: "Sure, one tall iced latte. Anything else?",
+      sceneUpdateJa: "ラテの注文を受け取り、店員が次の質問に進みます。",
       goodPoints: ["自然な流れ"],
       improvements: ["冠詞に注意"],
       modelAnswer: "I'd like a tall iced latte, please.",
@@ -28,25 +28,55 @@ describe("scoreAnswer", () => {
     );
 
     const result = await scoreAnswer("beginner-1", "I'd like a latte");
-    expect(result.reply).toContain("latte");
+    expect(result.sceneUpdateJa).toContain("ラテ");
     expect(result.total).toBe(80);
   });
 
-  it("日本語の reply はフォールバック英語に差し替える", async () => {
+  it("お題の再掲はクライアントで差し替える", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
           feedback: {
-            total: 0,
-            fluency: 0,
-            grammar: 0,
-            vocabulary: 0,
-            relevance: 0,
-            reply: "そういえ、水でいいですか？",
-            goodPoints: ["意図は伝わる"],
-            improvements: ["冠詞"],
+            total: 90,
+            fluency: 90,
+            grammar: 90,
+            vocabulary: 90,
+            relevance: 90,
+            sceneUpdateJa:
+              "隣に座った人が話しかけてきました。自己紹介してください。",
+            goodPoints: ["良い"],
+            improvements: ["改善"],
+            modelAnswer: "Nice to meet you. I'm Leo.",
+          },
+        }),
+      }),
+    );
+
+    const result = await scoreAnswer(
+      "beginner-2",
+      "Nice to meet you. I'm Leo, I'm from Japan.",
+    );
+    expect(result.sceneUpdateJa).not.toContain("自己紹介してください");
+    expect(result.sceneUpdateJa).toMatch(/Leo|日本|サラ/i);
+  });
+
+  it("sceneUpdateJa が短いときクライアントでフォールバックする", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          feedback: {
+            total: 70,
+            fluency: 70,
+            grammar: 70,
+            vocabulary: 70,
+            relevance: 70,
+            sceneUpdateJa: "短",
+            goodPoints: ["良い"],
+            improvements: ["改善"],
             modelAnswer: "I'd like a tall iced latte, please.",
           },
         }),
@@ -54,10 +84,10 @@ describe("scoreAnswer", () => {
     );
 
     const result = await scoreAnswer("beginner-1", "I'd like to tall latte");
-    expect(result.reply).toContain("iced latte");
+    expect(result.sceneUpdateJa).toContain("店員");
   });
 
-  it("reply 欠落の feedback は SCORING_FAILED になる", async () => {
+  it("sceneUpdateJa 欠落の feedback は SCORING_FAILED になる", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -69,8 +99,8 @@ describe("scoreAnswer", () => {
             grammar: 82,
             vocabulary: 75,
             relevance: 85,
-            goodPoints: [],
-            improvements: [],
+            goodPoints: ["良い"],
+            improvements: ["改善"],
             modelAnswer: "Hi",
           },
         }),
