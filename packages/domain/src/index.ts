@@ -6,6 +6,7 @@ export {
 } from "./entities/question-media.js";
 export { parseScoreFeedback, type ScoreFeedback } from "./entities/score-feedback.js";
 export { extractJsonFromLlmText } from "./lib/extract-llm-json.js";
+export { coerceScoreFeedbackRaw } from "./lib/coerce-score-feedback.js";
 export {
   containsJapanese,
   getSceneReplyFallback,

@@ -130,4 +130,37 @@ describe("WorkersAiScoringService", () => {
 
     expect(result.total).toBeGreaterThanOrEqual(30);
   });
+
+  it("1回目が不正JSONでも再試行して成功する", async () => {
+    let calls = 0;
+    const payload = {
+      total: 70,
+      fluency: 68,
+      grammar: 72,
+      vocabulary: 65,
+      relevance: 75,
+      reply: "Sure, one tall iced latte. For here or to go?",
+      goodPoints: ["意図が伝わる"],
+      improvements: ["冠詞"],
+      modelAnswer: "I'd like a tall iced latte, please.",
+    };
+    const fakeAi = {
+      async run() {
+        calls += 1;
+        if (calls === 1) {
+          return { response: "not json at all" };
+        }
+        return { response: JSON.stringify(payload) };
+      },
+    };
+
+    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
+    const result = await service.scoreAnswer({
+      question,
+      answerText: "I'd like to tall latte",
+    });
+
+    expect(calls).toBe(2);
+    expect(result.total).toBe(70);
+  });
 });

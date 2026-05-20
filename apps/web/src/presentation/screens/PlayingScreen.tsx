@@ -167,6 +167,11 @@ export function PlayingScreen({
               style={sans}
             />
             {voice.error && <p className="text-rose-300 text-sm mt-2">{voice.error}</p>}
+            {voice.isListening && !voice.useWhisper && (
+              <p className="text-purple-300 text-xs mt-2">
+                録音中です。英語で話してください。無音で止まっても自動で聞き直します。
+              </p>
+            )}
             {voice.useWhisper && (
               <p className="text-purple-300 text-xs mt-2">
                 Safari 等では録音後に Whisper で認識します（Cloudflare AI 使用）

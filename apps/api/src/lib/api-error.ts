@@ -45,7 +45,14 @@ export function classifyScoringError(error: unknown): {
     };
   }
 
-  if (lower.includes("empty response") || lower.includes("json")) {
+  if (
+    lower.includes("empty response") ||
+    lower.includes("json") ||
+    lower.includes("syntax") ||
+    lower.includes("parse") ||
+    lower.includes("reply must") ||
+    lower.includes("must be a")
+  ) {
     return {
       code: "SCORING_FAILED",
       message: "採点結果の取得に失敗しました。もう一度お試しください。",

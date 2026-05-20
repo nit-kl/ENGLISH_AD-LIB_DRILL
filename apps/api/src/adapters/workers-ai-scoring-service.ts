@@ -1,6 +1,7 @@
 import type { Question, ScoreFeedback, ScoringService } from "@english-adlib/domain";
 import {
   applyScoreFloor,
+  coerceScoreFeedbackRaw,
   extractJsonFromLlmText,
   normalizeSceneReply,
   parseScoreFeedback,
@@ -9,6 +10,8 @@ import {
 export type AiBinding = {
   run(model: string, input: Record<string, unknown>): Promise<unknown>;
 };
+
+const MAX_ATTEMPTS = 3;
 
 const JSON_SCHEMA = `{
   "total": number 0-100,
@@ -65,6 +68,50 @@ function buildUserPrompt(question: Question, answerText: string): string {
   ].join("\n");
 }
 
+function isRetryableScoringFailure(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("json") ||
+    lower.includes("parse") ||
+    lower.includes("syntax") ||
+    lower.includes("empty response") ||
+    lower.includes("reply must") ||
+    lower.includes("must be") ||
+    lower.includes("incomplete")
+  );
+}
+
+function parseWorkersAiResponse(
+  result: unknown,
+  question: Question,
+  answerText: string,
+): ScoreFeedback {
+  const payload = result as { response?: unknown };
+  const response = payload.response;
+
+  if (response == null || response === "") {
+    throw new Error("Empty response from Workers AI");
+  }
+
+  const raw =
+    typeof response === "object"
+      ? response
+      : typeof response === "string"
+        ? extractJsonFromLlmText(response)
+        : null;
+
+  if (raw == null) {
+    throw new Error("Unexpected Workers AI response shape");
+  }
+
+  const parsed = parseScoreFeedback(coerceScoreFeedbackRaw(raw));
+  const adjusted = applyScoreFloor(parsed, answerText);
+  return {
+    ...adjusted,
+    reply: normalizeSceneReply(adjusted.reply, question),
+  };
+}
+
 export class WorkersAiScoringService implements ScoringService {
   constructor(
     private readonly ai: AiBinding,
@@ -75,27 +122,33 @@ export class WorkersAiScoringService implements ScoringService {
     question: Question;
     answerText: string;
   }): Promise<ScoreFeedback> {
-    const result = (await this.ai.run(this.model, {
-      messages: [
-        { role: "system", content: buildSystemPrompt(input.question) },
-        {
-          role: "user",
-          content: buildUserPrompt(input.question, input.answerText),
-        },
-      ],
-      max_tokens: 700,
-    })) as { response?: string };
+    const messages = [
+      { role: "system", content: buildSystemPrompt(input.question) },
+      {
+        role: "user",
+        content: buildUserPrompt(input.question, input.answerText),
+      },
+    ];
 
-    const rawText = result.response ?? "";
-    if (!rawText) {
-      throw new Error("Empty response from Workers AI");
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+      try {
+        const result = await this.ai.run(this.model, {
+          messages,
+          max_tokens: 700,
+          temperature: attempt === 1 ? 0.35 : 0.15,
+        });
+        return parseWorkersAiResponse(result, input.question, input.answerText);
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : "Scoring failed";
+        if (attempt >= MAX_ATTEMPTS || !isRetryableScoringFailure(message)) {
+          throw error;
+        }
+      }
     }
 
-    const parsed = parseScoreFeedback(extractJsonFromLlmText(rawText));
-    const adjusted = applyScoreFloor(parsed, input.answerText);
-    return {
-      ...adjusted,
-      reply: normalizeSceneReply(adjusted.reply, input.question),
-    };
+    throw lastError instanceof Error ? lastError : new Error("Scoring failed");
   }
 }
