@@ -8,6 +8,7 @@ export class WhisperTranscriptionService {
   async transcribe(audioBytes: Uint8Array): Promise<string> {
     const result = await this.ai.run(WHISPER_MODEL, {
       audio: Array.from(audioBytes),
+      language: "en",
     });
 
     if (typeof result === "string") {

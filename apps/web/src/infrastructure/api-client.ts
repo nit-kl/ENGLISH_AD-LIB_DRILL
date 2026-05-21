@@ -128,7 +128,8 @@ export async function scoreAnswer(
 
 export async function transcribeAudio(blob: Blob): Promise<string> {
   const form = new FormData();
-  form.append("audio", blob, "recording.webm");
+  const ext = blob.type.includes("mp4") ? "m4a" : "webm";
+  form.append("audio", blob, `recording.${ext}`);
   const res = await fetch(`${baseUrl}/api/transcribe`, {
     method: "POST",
     body: form,
