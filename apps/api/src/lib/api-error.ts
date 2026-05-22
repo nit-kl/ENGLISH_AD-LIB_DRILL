@@ -51,7 +51,8 @@ export function classifyScoringError(error: unknown): {
     lower.includes("syntax") ||
     lower.includes("parse") ||
     lower.includes("reply must") ||
-    lower.includes("must be a")
+    lower.includes("must be a") ||
+    lower.includes("json mode couldn't be met")
   ) {
     return {
       code: "SCORING_FAILED",

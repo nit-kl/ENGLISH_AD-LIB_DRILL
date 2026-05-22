@@ -30,6 +30,7 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "店員さん",
         icon: "☕",
         hints: ["I'd like ~", "Can I have ~", "a tall iced latte"],
+        modelAnswer: "I'd like a tall iced latte, please.",
         // https://youtu.be/ii50mPdVdhk — Part2 開始 15s（YouTube 実測）
         media: {
           setup: {
@@ -53,15 +54,17 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "Sarah",
         icon: "🎒",
         hints: ["Nice to meet you", "I'm from ~", "I'm here to ~"],
+        modelAnswer:
+          "Nice to meet you, Sarah. I'm Yuki. I'm from Japan. I'm here to study English.",
         // https://youtu.be/IurgHMDUExE — Part2 開始 26s（Hook なし・マニフェスト実測）
         media: {
           setup: {
             youtubeVideoId: "IurgHMDUExE",
-            endSeconds: 25,
+            endSeconds: 26,
           },
           reveal: {
             youtubeVideoId: "IurgHMDUExE",
-            startSeconds: 25,
+            startSeconds: 26,
           },
         },
       },
@@ -76,15 +79,17 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "観光客",
         icon: "🗺️",
         hints: ["Go straight", "Turn left/right", "It's right over there"],
+        modelAnswer:
+          "Sure! Go straight down this street. Shibuya Crossing is right over there.",
         // https://youtu.be/BmESAC8gpf0 — Part2 開始 31s（Hook なし・メタデータ推定 0:32 から -1s）
         media: {
           setup: {
             youtubeVideoId: "BmESAC8gpf0",
-            endSeconds: 24,
+            endSeconds: 23,
           },
           reveal: {
             youtubeVideoId: "BmESAC8gpf0",
-            startSeconds: 24,
+            startSeconds: 23,
           },
         },
       },
@@ -108,6 +113,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "フロント係",
         icon: "🏨",
         hints: ["I have a reservation", "Could you check again", "This is unacceptable"],
+        modelAnswer:
+          "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.",
       },
       {
         id: "intermediate-2",
@@ -120,6 +127,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "面接官",
         icon: "💼",
         hints: ["In my previous role", "I was responsible for", "As a result"],
+        modelAnswer:
+          "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent.",
       },
       {
         id: "intermediate-3",
@@ -132,6 +141,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "同僚",
         icon: "💬",
         hints: ["It was pretty good", "I ended up ~ing", "How about you?"],
+        modelAnswer:
+          "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?",
       },
     ],
   },
@@ -153,6 +164,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "司会",
         icon: "🎤",
         hints: ["Imagine a world where ~", "Today I want to talk about", "But first, let me ask you"],
+        modelAnswer:
+          "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room.",
       },
       {
         id: "advanced-2",
@@ -165,6 +178,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "上司",
         icon: "⚖️",
         hints: ["I understand your point, however", "With all due respect", "May I suggest an alternative"],
+        modelAnswer:
+          "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?",
       },
       {
         id: "advanced-3",
@@ -177,6 +192,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "お客様",
         icon: "🔥",
         hints: ["I sincerely apologize", "Let me make this right", "I completely understand your frustration"],
+        modelAnswer:
+          "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward.",
       },
     ],
   },
@@ -198,6 +215,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "徳川家康",
         icon: "⚔️",
         hints: ["It's like a town square where ~", "Imagine a messenger that ~", "Everyone can hear what you say"],
+        modelAnswer:
+          "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly.",
       },
       {
         id: "legendary-2",
@@ -210,6 +229,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "議長",
         icon: "🌏",
         hints: ["Distinguished delegates", "The time for action is now", "We owe it to future generations"],
+        modelAnswer:
+          "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today.",
       },
       {
         id: "legendary-3",
@@ -222,6 +243,8 @@ export const STAGES: Record<StageKey, Stage> = {
         counterpart: "遊牧民",
         icon: "🏜️",
         hints: ["This isn't just any sand", "What makes this special is", "You'd be the first in your tribe to"],
+        modelAnswer:
+          "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure.",
       },
     ],
   },

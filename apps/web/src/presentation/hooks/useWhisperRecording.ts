@@ -1,7 +1,16 @@
 import { useCallback, useRef, useState } from "react";
 import { ApiClientError, transcribeAudio } from "../../infrastructure/api-client";
+import type { VoiceInputLanguage } from "./useVoiceInput";
 
-export function useWhisperRecording(onTranscript: (text: string) => void) {
+export type UseWhisperRecordingOptions = {
+  /** 未指定時は Whisper が言語を自動判定（日本語入力向け） */
+  language?: VoiceInputLanguage;
+};
+
+export function useWhisperRecording(
+  onTranscript: (text: string) => void,
+  options: UseWhisperRecordingOptions = {},
+) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +53,7 @@ export function useWhisperRecording(onTranscript: (text: string) => void) {
         }
         setIsTranscribing(true);
         try {
-          const text = await transcribeAudio(blob);
+          const text = await transcribeAudio(blob, options.language);
           onTranscript(text);
         } catch (e) {
           const msg =
@@ -63,7 +72,7 @@ export function useWhisperRecording(onTranscript: (text: string) => void) {
     } catch {
       setError("マイクへのアクセスが拒否されました。ブラウザの設定を確認してください。");
     }
-  }, [onTranscript]);
+  }, [onTranscript, options.language]);
 
   const toggle = useCallback(() => {
     if (isRecording) {

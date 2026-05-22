@@ -12,6 +12,7 @@ const sampleQuestion: Question = {
   counterpart: "店員さん",
   icon: "☕",
   hints: ["I'd like ~"],
+  modelAnswer: "I'd like a tall iced latte, please.",
 };
 
 class FakeScoringService implements ScoringService {

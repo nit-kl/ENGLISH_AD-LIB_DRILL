@@ -76,7 +76,7 @@ export function RevealScreen({ question, feedback, finishLabel, onHome, onBackTo
             模範解答
           </div>
           <p className="text-white text-sm italic leading-relaxed">
-            &ldquo;{feedback.modelAnswer}&rdquo;
+            &ldquo;{question.modelAnswer}&rdquo;
           </p>
         </div>
 

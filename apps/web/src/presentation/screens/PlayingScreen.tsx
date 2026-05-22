@@ -172,9 +172,9 @@ export function PlayingScreen({
                 録音中です。話し終わったらもう一度ボタンを押して認識します。
               </p>
             )}
-            {voice.isBusy && (
+            {voice.isBusy && voice.useWhisper && (
               <p className="text-purple-300 text-xs mt-2">
-                Whisper で英語を認識しています…（Cloudflare AI 使用）
+                英語を認識しています…（Cloudflare AI 使用）
               </p>
             )}
             <SubmitErrorBanner error={submitError} onRetry={onSubmit} />
@@ -207,6 +207,7 @@ export function PlayingScreen({
           feedback && (
             <ScoreResultPanel
               feedback={feedback}
+              modelAnswer={q.modelAnswer}
               animatedScore={animatedScore}
               userAnswer={userInput.trim() || "..."}
               nextLabel={scoringNextLabel}

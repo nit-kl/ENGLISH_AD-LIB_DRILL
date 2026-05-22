@@ -15,6 +15,7 @@ const cafeQuestion: Question = {
   counterpart: "店員さん",
   icon: "☕",
   hints: [],
+  modelAnswer: "I'd like a tall iced latte, please.",
 };
 
 describe("scene-reply", () => {

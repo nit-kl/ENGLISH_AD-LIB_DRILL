@@ -12,6 +12,8 @@ export type Question = {
   counterpart: string;
   icon: string;
   hints: string[];
+  /** お題ごとの模範解答（学習者が言う英文・システム固定） */
+  modelAnswer: string;
   /** 設定時は動画お題 UI（字幕は YouTube CC） */
   media?: QuestionMedia;
 };

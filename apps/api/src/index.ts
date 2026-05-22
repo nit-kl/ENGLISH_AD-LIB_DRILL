@@ -71,10 +71,16 @@ app.post("/api/transcribe", async (c) => {
     );
   }
 
+  const languageField = form.get("language");
+  const language =
+    typeof languageField === "string" && languageField.trim()
+      ? languageField.trim()
+      : undefined;
+
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
     const service = new WhisperTranscriptionService(c.env.AI);
-    const text = await service.transcribe(bytes);
+    const text = await service.transcribe(bytes, { language });
     return c.json({ text });
   } catch (error) {
     const classified = classifyTranscriptionError(error);

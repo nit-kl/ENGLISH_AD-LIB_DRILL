@@ -126,10 +126,16 @@ export async function scoreAnswer(
   throw lastError;
 }
 
-export async function transcribeAudio(blob: Blob): Promise<string> {
+export async function transcribeAudio(
+  blob: Blob,
+  language?: "en" | "ja",
+): Promise<string> {
   const form = new FormData();
   const ext = blob.type.includes("mp4") ? "m4a" : "webm";
   form.append("audio", blob, `recording.${ext}`);
+  if (language) {
+    form.append("language", language);
+  }
   const res = await fetch(`${baseUrl}/api/transcribe`, {
     method: "POST",
     body: form,

@@ -47,7 +47,7 @@ export function App() {
     setUserInput((prev) => (prev ? `${prev} ${text}` : text));
   }, []);
 
-  const voice = useVoiceInput(appendTranscript);
+  const voice = useVoiceInput(appendTranscript, { language: "en" });
 
   const getCurrentQuestions = (): Question[] => {
     if (currentStage) return STAGES[currentStage].questions;

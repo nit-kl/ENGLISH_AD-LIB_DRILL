@@ -17,6 +17,8 @@ const beginner2: Question = {
   counterpart: "Sarah",
   icon: "🎒",
   hints: ["Nice to meet you"],
+  modelAnswer:
+    "Nice to meet you, Sarah. I'm Yuki. I'm from Japan. I'm here to study English.",
 };
 
 describe("looksLikeSetupRepeat", () => {

@@ -12,6 +12,7 @@ const question: Question = {
   counterpart: "店員さん",
   icon: "☕",
   hints: ["I'd like ~"],
+  modelAnswer: "I'd like a tall iced latte, please.",
 };
 
 const validPayload = {
@@ -24,7 +25,6 @@ const validPayload = {
     "「トールのラテ」と伝えたので、店員は注文を受け取り、これから for here or to go を聞く段階です。",
   goodPoints: ["良い"],
   improvements: ["改善"],
-  modelAnswer: "I'd like a tall iced latte, please.",
 };
 
 describe("WorkersAiScoringService", () => {
@@ -43,7 +43,29 @@ describe("WorkersAiScoringService", () => {
 
     expect(result.total).toBe(75);
     expect(result.sceneUpdateJa).toContain("店員");
-    expect(result.modelAnswer).toContain("latte");
+    expect(result.modelAnswer).toBe("I'd like a tall iced latte, please.");
+  });
+
+  it("LLMが返した模範解答はお題の固定文で上書きする", async () => {
+    const fakeAi = {
+      async run() {
+        return {
+          response: JSON.stringify({
+            ...validPayload,
+            modelAnswer: "Wrong answer from AI",
+          }),
+        };
+      },
+    };
+
+    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
+    const result = await service.scoreAnswer({
+      question,
+      answerText: "I'd like a latte please",
+    });
+
+    expect(result.modelAnswer).toBe(question.modelAnswer);
+    expect(result.modelAnswer).not.toContain("Wrong");
   });
 
   it("JSON 末尾に余計なテキストがあってもパースできる", async () => {
@@ -86,6 +108,8 @@ describe("WorkersAiScoringService", () => {
         situation:
           '語学学校。Sarah が Hi と話しかけてきました。自己紹介してください。',
         counterpart: "Sarah",
+        modelAnswer:
+          "Nice to meet you, Sarah. I'm Yuki. I'm from Japan. I'm here to study English.",
       },
       answerText: "Nice to meet you. I'm Leo, I'm from Japan.",
     });
@@ -136,6 +160,23 @@ describe("WorkersAiScoringService", () => {
     });
 
     expect(result.total).toBeGreaterThanOrEqual(30);
+  });
+
+  it("JSON Mode のオブジェクト response をそのままパースする", async () => {
+    const fakeAi = {
+      async run() {
+        return { response: validPayload };
+      },
+    };
+
+    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.1-8b-instruct");
+    const result = await service.scoreAnswer({
+      question,
+      answerText: "I'd like to tall latte",
+    });
+
+    expect(result.total).toBe(75);
+    expect(result.sceneUpdateJa).toContain("店員");
   });
 
   it("1回目が不正JSONでも再試行して成功する", async () => {

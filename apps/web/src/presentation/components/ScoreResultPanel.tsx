@@ -4,6 +4,7 @@ import { SparkleField } from "./SparkleField";
 
 type Props = {
   feedback: ScoreFeedback;
+  modelAnswer: string;
   animatedScore: number;
   userAnswer: string;
   nextLabel: string;
@@ -14,6 +15,7 @@ type Props = {
 
 export function ScoreResultPanel({
   feedback,
+  modelAnswer,
   animatedScore,
   userAnswer,
   nextLabel,
@@ -64,7 +66,7 @@ export function ScoreResultPanel({
                   模範解答
                 </div>
                 <p className="text-white text-sm italic leading-relaxed">
-                  &ldquo;{feedback.modelAnswer}&rdquo;
+                  &ldquo;{modelAnswer}&rdquo;
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 text-sm">
