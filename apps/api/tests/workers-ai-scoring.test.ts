@@ -169,7 +169,7 @@ describe("WorkersAiScoringService", () => {
       },
     };
 
-    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.1-8b-instruct");
+    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
     const result = await service.scoreAnswer({
       question,
       answerText: "I'd like to tall latte",

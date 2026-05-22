@@ -7,5 +7,5 @@ binding = "AI"
 remote = true
 
 [vars]
-# 8b + プロンプト JSON（json_schema モードは一部お題で JSON Mode couldn't be met → 502）
-SCORING_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+# ADR-0004: 1b は採点1回あたり約15–25 Neurons。8b は無料枠(10k/日)を短時間で使い切りやすい。
+SCORING_MODEL = "@cf/meta/llama-3.2-1b-instruct"

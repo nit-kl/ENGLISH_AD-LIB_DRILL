@@ -59,13 +59,6 @@ export async function fetchStages(): Promise<StageSummary[]> {
   return data.stages;
 }
 
-const SCORE_CLIENT_MAX_ATTEMPTS = 2;
-const SCORE_RETRY_DELAY_MS = 500;
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 async function scoreAnswerOnce(
   questionId: string,
   answerText: string,
@@ -109,21 +102,7 @@ export async function scoreAnswer(
   questionId: string,
   answerText: string,
 ): Promise<ScoreFeedback> {
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= SCORE_CLIENT_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      return await scoreAnswerOnce(questionId, answerText);
-    } catch (error) {
-      lastError = error;
-      const retryable =
-        error instanceof ApiClientError && error.retryable && error.status >= 500;
-      if (!retryable || attempt >= SCORE_CLIENT_MAX_ATTEMPTS) {
-        throw error;
-      }
-      await delay(SCORE_RETRY_DELAY_MS * attempt);
-    }
-  }
-  throw lastError;
+  return scoreAnswerOnce(questionId, answerText);
 }
 
 export async function transcribeAudio(

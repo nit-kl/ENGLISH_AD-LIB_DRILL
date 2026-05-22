@@ -11,7 +11,8 @@ export type AiBinding = {
   run(model: string, input: Record<string, unknown>): Promise<unknown>;
 };
 
-const MAX_ATTEMPTS = 4;
+/** JSON 失敗時の再試行上限（Neuron は呼び出しごとに消費） */
+const MAX_ATTEMPTS = 2;
 
 /** プロンプト用（Workers AI JSON Schema モードは複雑な採点で失敗しやすい） */
 const JSON_SCHEMA_PROMPT = `{
