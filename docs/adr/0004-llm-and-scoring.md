@@ -39,6 +39,11 @@ Accepted
 5. **プロンプト出力**: JSON 固定（fluency, grammar, vocabulary, relevance, goodPoints, improvements, modelAnswer, total）
 6. **Neuron 超過時**: API は 503 + ユーザー向け「本日の無料枠を超えました」メッセージ（実装は follow-up）
 
+## フォールバック（ADR-0008）
+
+- Workers AI 失敗時: **Gemini Developer API 無料枠**（`gemini-2.5-flash-lite`）へ 1 回フォールバック
+- 詳細: [ADR-0008](./0008-gemini-ai-fallback.md)
+
 ## 将来オプション（ADR 変更時に検討）
 
 - 開発環境のみ `OLLAMA_BASE_URL` を向けた `OllamaScoringService` アダプタ

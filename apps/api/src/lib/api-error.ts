@@ -35,7 +35,9 @@ export function classifyScoringError(error: unknown): {
     lower.includes("quota") ||
     lower.includes("limit") ||
     lower.includes("rate") ||
-    lower.includes("429")
+    lower.includes("429") ||
+    lower.includes("gemini api error 429") ||
+    lower.includes("resource_exhausted")
   ) {
     return {
       code: "QUOTA_EXCEEDED",

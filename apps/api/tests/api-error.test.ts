@@ -14,4 +14,12 @@ describe("classifyScoringError", () => {
     expect(result.code).toBe("SCORING_FAILED");
     expect(result.retryable).toBe(true);
   });
+
+  it("Gemini 429 を QUOTA_EXCEEDED に分類", () => {
+    const result = classifyScoringError(
+      new Error("Gemini API error 429: Resource exhausted"),
+    );
+    expect(result.code).toBe("QUOTA_EXCEEDED");
+    expect(result.status).toBe(503);
+  });
 });

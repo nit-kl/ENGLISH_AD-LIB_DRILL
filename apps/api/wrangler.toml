@@ -9,3 +9,6 @@ remote = true
 [vars]
 # ADR-0004: 1b は採点1回あたり約15–25 Neurons。8b は無料枠(10k/日)を短時間で使い切りやすい。
 SCORING_MODEL = "@cf/meta/llama-3.2-1b-instruct"
+# ADR-0008: Gemini フォールバック（無料枠・請求 OFF 推奨）
+GEMINI_MODEL = "gemini-2.5-flash-lite"
+GEMINI_FALLBACK_ENABLED = "false"

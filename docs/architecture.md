@@ -50,7 +50,7 @@
 | ステージ・問題データ | `packages/content` |
 | 採点後処理（floor / sceneUpdate 品質） | `packages/application`（SubmitAnswerUseCase） |
 | 中間ターンの相手返答 | `packages/application`（SubmitConversationTurnUseCase） + `apps/api`（WorkersAiCounterpartReplyService） |
-| LLM 呼び出し・JSON パース | `apps/api`（WorkersAiScoringService） |
+| LLM 呼び出し・JSON パース | `apps/api`（Workers AI → Gemini フォールバック、[ADR-0008](./adr/0008-gemini-ai-fallback.md)） |
 | HTTP 通信 | `apps/web/infrastructure`（scoring-api-client） |
 | 画面遷移・タイマー | `apps/web/application`（useGameFlow） |
 | UI テーマ（Tailwind colorClass） | `apps/web/presentation/config` |
