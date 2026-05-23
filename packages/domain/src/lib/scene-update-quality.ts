@@ -49,15 +49,3 @@ export function looksLikeSetupRepeat(sceneUpdateJa: string, question: Question):
 
   return false;
 }
-
-export function resolveSceneUpdateJa(
-  sceneUpdateJa: string,
-  question: Question,
-  answerText: string,
-): string {
-  const trimmed = sceneUpdateJa.trim();
-  if (trimmed.length >= 12 && !looksLikeSetupRepeat(trimmed, question)) {
-    return trimmed;
-  }
-  return buildSceneUpdateFallback(question, answerText);
-}

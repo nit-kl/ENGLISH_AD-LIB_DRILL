@@ -1,5 +1,7 @@
 import { ChevronRight, Star } from "lucide-react";
-import { STAGES, type StageKey } from "@english-adlib/domain";
+import { STAGES } from "@english-adlib/content";
+import type { StageKey } from "@english-adlib/domain";
+import { getStageColorClass } from "../config/stage-theme";
 
 const serif = { fontFamily: '"Noto Serif JP", serif' } as const;
 const sans = { fontFamily: '"Noto Sans JP", sans-serif' } as const;
@@ -28,7 +30,7 @@ export function StageSelectScreen({ onBack, onSelect }: Props) {
               key={key}
               type="button"
               onClick={() => onSelect(key)}
-              className={`group relative bg-gradient-to-br ${stage.colorClass} rounded-2xl p-6 text-left hover:scale-[1.02] transition-all shadow-xl overflow-hidden`}
+              className={`group relative bg-gradient-to-br ${getStageColorClass(key)} rounded-2xl p-6 text-left hover:scale-[1.02] transition-all shadow-xl overflow-hidden`}
             >
               <div className="absolute top-3 right-3 px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full text-white text-xs font-bold">
                 Lv.{idx + 1}

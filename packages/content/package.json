@@ -1,5 +1,5 @@
 {
-  "name": "@english-adlib/application",
+  "name": "@english-adlib/content",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,6 @@
     "build": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@english-adlib/content": "workspace:*",
     "@english-adlib/domain": "workspace:*"
   },
   "devDependencies": {

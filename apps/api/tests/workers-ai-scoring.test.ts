@@ -27,6 +27,7 @@ const validPayload = {
   improvements: ["改善"],
 };
 
+/** 責務: LLM 呼び出しと生 ScoreFeedback パース（後処理は application 層） */
 describe("WorkersAiScoringService", () => {
   it("LLMのJSONレスポンスをScoreFeedbackにパースする", async () => {
     const fakeAi = {
@@ -84,82 +85,6 @@ describe("WorkersAiScoringService", () => {
     });
 
     expect(result.sceneUpdateJa.length).toBeGreaterThan(10);
-  });
-
-  it("お題の再掲は差し替えて返す", async () => {
-    const fakeAi = {
-      async run() {
-        return {
-          response: JSON.stringify({
-            ...validPayload,
-            sceneUpdateJa:
-              '隣に座った人が "Hi!" と話しかけてきました。自己紹介してください。',
-          }),
-        };
-      },
-    };
-
-    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
-    const result = await service.scoreAnswer({
-      question: {
-        ...question,
-        id: "beginner-2",
-        title: "初対面の挨拶",
-        situation:
-          '語学学校。Sarah が Hi と話しかけてきました。自己紹介してください。',
-        counterpart: "Sarah",
-        modelAnswer:
-          "Nice to meet you, Sarah. I'm Yuki. I'm from Japan. I'm here to study English.",
-      },
-      answerText: "Nice to meet you. I'm Leo, I'm from Japan.",
-    });
-
-    expect(result.sceneUpdateJa).not.toContain("自己紹介してください");
-    expect(result.sceneUpdateJa).toMatch(/Leo|レオ|日本|サラ|Sarah/i);
-  });
-
-  it("sceneUpdateJa が短すぎるときフォールバックする", async () => {
-    const fakeAi = {
-      async run() {
-        return {
-          response: JSON.stringify({ ...validPayload, sceneUpdateJa: "短い" }),
-        };
-      },
-    };
-
-    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
-    const result = await service.scoreAnswer({
-      question,
-      answerText: "I'd like to tall latte",
-    });
-
-    expect(result.sceneUpdateJa).toContain("店員");
-    expect(result.sceneUpdateJa.length).toBeGreaterThan(12);
-  });
-
-  it("LLM が total 0 でも英語回答なら点数を付ける", async () => {
-    const fakeAi = {
-      async run() {
-        return {
-          response: JSON.stringify({
-            ...validPayload,
-            total: 0,
-            fluency: 0,
-            grammar: 0,
-            vocabulary: 0,
-            relevance: 0,
-          }),
-        };
-      },
-    };
-
-    const service = new WorkersAiScoringService(fakeAi, "@cf/meta/llama-3.2-1b-instruct");
-    const result = await service.scoreAnswer({
-      question,
-      answerText: "I'd like to tall latte",
-    });
-
-    expect(result.total).toBeGreaterThanOrEqual(30);
   });
 
   it("JSON Mode のオブジェクト response をそのままパースする", async () => {

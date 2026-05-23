@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { coerceScoreFeedbackRaw } from "../src/lib/coerce-score-feedback.js";
-import { parseScoreFeedback } from "../src/entities/score-feedback.js";
+import { parseScoreFeedback } from "@english-adlib/domain";
+import { coerceScoreFeedbackRaw } from "../src/lib/llm/coerce-score-feedback.js";
 
 const base = {
   total: "72",
@@ -14,6 +14,7 @@ const base = {
   modelAnswer: "I'd like a tall iced latte, please.",
 };
 
+/** 責務: LLM 出力の型ゆれを正規化して domain パース可能にする */
 describe("coerceScoreFeedbackRaw", () => {
   it("文字列の点数と空配列を補正して parse できる", () => {
     const coerced = coerceScoreFeedbackRaw(base);

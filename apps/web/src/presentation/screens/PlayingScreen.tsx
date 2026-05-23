@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { ChevronRight, Home, Mic, MicOff, Send } from "lucide-react";
 import { countWords, hasQuestionMedia, type Question, type ScoreFeedback } from "@english-adlib/domain";
-import type { ApiClientError } from "../../infrastructure/api-client";
+import type { ApiClientError } from "../../infrastructure/scoring-api-client";
 import { ScoreResultPanel } from "../components/ScoreResultPanel";
 import { SubmitErrorBanner } from "../components/SubmitErrorBanner";
 import { YouTubePlayer } from "../components/YouTubePlayer";

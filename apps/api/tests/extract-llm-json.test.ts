@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   extractJsonFromLlmText,
   repairUnescapedQuotesInJsonStrings,
-} from "../src/lib/extract-llm-json.js";
+} from "../src/lib/llm/extract-llm-json.js";
 
+/** 責務: LLM 出力テキストから JSON を頑健に抽出する */
 describe("extractJsonFromLlmText", () => {
   it("素の JSON をパースする", () => {
     const result = extractJsonFromLlmText('{"total": 80}');

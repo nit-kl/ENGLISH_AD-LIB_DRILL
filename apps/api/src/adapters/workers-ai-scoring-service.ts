@@ -1,11 +1,7 @@
 import type { Question, ScoreFeedback, ScoringService } from "@english-adlib/domain";
-import {
-  applyScoreFloor,
-  coerceScoreFeedbackRaw,
-  extractJsonFromLlmText,
-  parseScoreFeedback,
-  resolveSceneUpdateJa,
-} from "@english-adlib/domain";
+import { parseScoreFeedback } from "@english-adlib/domain";
+import { coerceScoreFeedbackRaw } from "../lib/llm/coerce-score-feedback.js";
+import { extractJsonFromLlmText } from "../lib/llm/extract-llm-json.js";
 
 export type AiBinding = {
   run(model: string, input: Record<string, unknown>): Promise<unknown>;
@@ -125,21 +121,6 @@ function isRetryableScoringFailure(message: string): boolean {
   );
 }
 
-function applySceneUpdateJa(
-  feedback: ScoreFeedback,
-  question: Question,
-  answerText: string,
-): ScoreFeedback {
-  return {
-    ...feedback,
-    sceneUpdateJa: resolveSceneUpdateJa(
-      feedback.sceneUpdateJa,
-      question,
-      answerText,
-    ),
-  };
-}
-
 function unwrapWorkersAiPayload(result: unknown): unknown {
   if (typeof result === "object" && result !== null) {
     const record = result as Record<string, unknown>;
@@ -158,11 +139,7 @@ function unwrapWorkersAiPayload(result: unknown): unknown {
   return null;
 }
 
-function parseWorkersAiResponse(
-  result: unknown,
-  question: Question,
-  answerText: string,
-): ScoreFeedback {
+function parseWorkersAiResponse(result: unknown, question: Question): ScoreFeedback {
   const response = unwrapWorkersAiPayload(result);
 
   if (response == null || response === "") {
@@ -180,16 +157,15 @@ function parseWorkersAiResponse(
     throw new Error("Unexpected Workers AI response shape");
   }
 
-  const parsed = parseScoreFeedback(
+  return parseScoreFeedback(
     coerceScoreFeedbackRaw({
       ...(typeof raw === "object" && raw !== null ? raw : {}),
       modelAnswer: question.modelAnswer,
     }),
   );
-  const adjusted = applyScoreFloor(parsed, answerText);
-  return applySceneUpdateJa(adjusted, question, answerText);
 }
 
+/** LLM 呼び出しと生 ScoreFeedback パースのみ（後処理は application 層） */
 export class WorkersAiScoringService implements ScoringService {
   constructor(
     private readonly ai: AiBinding,
@@ -217,11 +193,7 @@ export class WorkersAiScoringService implements ScoringService {
           max_tokens: 700,
           temperature: attempt === 1 ? 0.35 : 0.15,
         });
-        return parseWorkersAiResponse(
-          result,
-          input.question,
-          input.answerText,
-        );
+        return parseWorkersAiResponse(result, input.question);
       } catch (error) {
         lastError = error;
         const message = scoringErrorMessage(error);

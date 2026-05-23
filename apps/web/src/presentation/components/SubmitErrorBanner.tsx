@@ -1,5 +1,5 @@
 import { RotateCcw } from "lucide-react";
-import type { ApiClientError } from "../../infrastructure/api-client";
+import type { ApiClientError } from "../../infrastructure/scoring-api-client";
 
 type Props = {
   error: ApiClientError | null;

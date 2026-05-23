@@ -62,12 +62,12 @@ test("動画お題で続きを見る→Part2視聴後に次へ進める", async 
 
   await page.getByRole("button", { name: "模範解答と解説を見る" }).click();
   await expect(page.getByText("模範解答・解説")).toBeVisible();
-  await expect(page.getByText("模範解答")).toBeVisible();
+  await expect(page.getByText("模範解答", { exact: true })).toBeVisible();
 
-  await expect(page.getByRole("button", { name: "一覧に戻る" })).toBeDisabled();
   await expect(page.getByText("視聴完了！次に進めます")).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByRole("button", { name: "一覧に戻る" })).toBeEnabled();
   await page.getByRole("button", { name: "一覧に戻る" }).click();
 
   await expect(page.getByText("好きなシチュエーションから挑戦できます")).toBeVisible();
-  await expect(page.getByText("挑戦済み")).toBeVisible();
+  await expect(page.getByText("挑戦済み", { exact: true })).toBeVisible();
 });

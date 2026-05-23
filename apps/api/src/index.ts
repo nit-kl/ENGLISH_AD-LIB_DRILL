@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { SubmitAnswerUseCase } from "@english-adlib/application";
-import { getQuestionById, STAGES } from "@english-adlib/domain";
+import { ListStagesUseCase, SubmitAnswerUseCase } from "@english-adlib/application";
+import { staticStageRepository } from "@english-adlib/content";
 import { WhisperTranscriptionService } from "./adapters/whisper-transcription-service.js";
 import {
   WorkersAiScoringService,
@@ -14,6 +14,7 @@ import {
 } from "./lib/api-error.js";
 
 const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
+const stageRepository = staticStageRepository;
 
 export type ApiBindings = {
   AI: AiBinding;
@@ -37,12 +38,12 @@ app.use("*", async (c, next) => {
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 
 app.get("/api/stages", (c) => {
-  const payload = Object.values(STAGES).map((stage) => ({
+  const listStages = new ListStagesUseCase(stageRepository);
+  const payload = listStages.execute().map((stage) => ({
     key: stage.key,
     label: stage.label,
     sublabel: stage.sublabel,
     desc: stage.desc,
-    colorClass: stage.colorClass,
     questionCount: stage.questions.length,
     questions: stage.questions,
   }));
@@ -99,7 +100,7 @@ app.post("/api/score", async (c) => {
     answerText: string;
   }>();
 
-  const question = getQuestionById(body.questionId);
+  const question = stageRepository.getQuestionById(body.questionId);
   if (!question) {
     return apiErrorResponse("NOT_FOUND", "Question not found", 404, false);
   }

@@ -1,10 +1,7 @@
 import { CheckCircle2, ChevronRight, Film, Star } from "lucide-react";
-import {
-  hasQuestionMedia,
-  STAGES,
-  type Question,
-  type StageKey,
-} from "@english-adlib/domain";
+import { STAGES } from "@english-adlib/content";
+import { hasQuestionMedia, type Question, type StageKey } from "@english-adlib/domain";
+import { getStageColorClass } from "../config/stage-theme";
 
 const serif = { fontFamily: '"Noto Serif JP", serif' } as const;
 const sans = { fontFamily: '"Noto Sans JP", sans-serif' } as const;
@@ -52,7 +49,7 @@ export function QuestionListScreen({
         <p className="text-purple-200 mb-8 text-sm">好きなシチュエーションから挑戦できます（順不同）</p>
 
         <div
-          className={`relative bg-gradient-to-br ${stage.colorClass} rounded-2xl p-6 mb-8 shadow-xl overflow-hidden`}
+          className={`relative bg-gradient-to-br ${getStageColorClass(stageKey)} rounded-2xl p-6 mb-8 shadow-xl overflow-hidden`}
         >
           <div className="absolute top-3 right-3 px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full text-white text-xs font-bold">
             Lv.{stageLevel}
