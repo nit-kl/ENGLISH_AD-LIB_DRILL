@@ -1,5 +1,5 @@
 import type { Question, ScoreFeedback } from "@english-adlib/domain";
-import { isLowQualitySceneUpdateJa, parseScoreFeedback } from "@english-adlib/domain";
+import { parseScoreFeedback } from "@english-adlib/domain";
 import { coerceScoreFeedbackRaw } from "./coerce-score-feedback.js";
 import { extractJsonFromLlmText } from "./extract-llm-json.js";
 
@@ -43,16 +43,10 @@ export function parseScoreLlmResponse(
     throw new Error(`Unexpected ${providerLabel} response shape`);
   }
 
-  const parsed = parseScoreFeedback(
+  return parseScoreFeedback(
     coerceScoreFeedbackRaw({
       ...(typeof raw === "object" && raw !== null ? raw : {}),
       modelAnswer: question.modelAnswer,
     }),
   );
-
-  if (isLowQualitySceneUpdateJa(parsed.sceneUpdateJa, question)) {
-    throw new Error("sceneUpdateJa must be Japanese prose, not a conversation log");
-  }
-
-  return parsed;
 }

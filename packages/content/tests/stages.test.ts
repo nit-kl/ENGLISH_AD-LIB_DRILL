@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { hasQuestionMedia } from "@english-adlib/domain";
 import { STAGES } from "../src/stages-data.js";
 import { staticStageRepository } from "../src/static-stage-repository.js";
 
@@ -28,5 +29,14 @@ describe("stages data", () => {
     expect(STAGES.intermediate.conversationTurns).toBe(2);
     expect(STAGES.advanced.conversationTurns).toBe(3);
     expect(STAGES.legendary.conversationTurns).toBe(4);
+  });
+
+  it("intermediate-1 に YouTube 動画が紐づいている", () => {
+    const q = STAGES.intermediate.questions.find((item) => item.id === "intermediate-1");
+    expect(q).toBeDefined();
+    expect(hasQuestionMedia(q!)).toBe(true);
+    expect(q!.media?.setup.youtubeVideoId).toBe("vpl3bvpg2Ck");
+    expect(q!.media?.setup.endSeconds).toBe(39);
+    expect(q!.media?.reveal.startSeconds).toBe(39);
   });
 });

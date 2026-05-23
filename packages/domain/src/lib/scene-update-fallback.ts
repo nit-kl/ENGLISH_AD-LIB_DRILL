@@ -32,6 +32,8 @@ export function buildSceneUpdateFallback(question: Question, answerText: string)
     }
     case "beginner-3":
       return `あなたが「${said}」と道案内や説明をしたので、相手は礼を言いながら納得した様子です。場面は道順の確認が終わり、次の行動（出発・お礼のやり取り）に進んでいます。`;
+    case "intermediate-1":
+      return `予約があると伝え確認を求めたあなたの発言（「${said}」）を受けて、${question.counterpart}が予約名や確認メールを改めて調べる場面に進んでいます。落ち着いて状況説明が伝わった状態です。`;
     default:
       return `あなたの発言「${said}」のあと、${question.counterpart}がそれを受け止め、場面は「${question.title}」の次のやり取りに進みました。お題の説明を繰り返すのではなく、この新しい状態を想像してください。`;
   }

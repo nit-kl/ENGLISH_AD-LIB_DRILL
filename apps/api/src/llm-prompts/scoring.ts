@@ -23,6 +23,11 @@ BAD (never): restating the café greeting or "注文してください".`;
 レオさんが日本から来て留学中だと自己紹介したので、サラは笑顔でうなずき、学校や英語学習の話を続ける場面に進みました。
 BAD (never): 「サラが Hi と話しかけてきました。自己紹介してください。」— that is BEFORE the learner spoke.`;
   }
+  if (question.id === "intermediate-1") {
+    return `GOOD for multi-turn hotel check-in (reservation + confirmation email):
+フロント係が予約名「Kojima」を再検索し、確認メールの提示を求めたあと、あなたがメールアドレスを伝えたので、画面を確認する段階に進みました。
+BAD (never): JSON logs like {"Learner said": ...}, repeating「予約記録がないと言われました」, or English-only sceneUpdateJa.`;
+  }
   return `GOOD sceneUpdateJa must change when the learner's line changes. BAD: repeating the situation field.`;
 }
 

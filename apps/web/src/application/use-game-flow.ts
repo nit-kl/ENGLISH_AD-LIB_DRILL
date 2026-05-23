@@ -133,6 +133,8 @@ export function useGameFlow() {
   }, []);
 
   const handleTimerTimeout = useCallback(() => {
+    // 0秒到達後に effect が再実行されると handleSubmit が連打されるのを防ぐ
+    setAnswerTimerActive(false);
     void handleSubmit();
   }, [handleSubmit]);
 
