@@ -22,6 +22,16 @@ export const intermediateQuestions: Question[] = [
     hints: ["I have a reservation", "Could you check again", "This is unacceptable"],
     modelAnswer:
       "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.",
+    media: {
+      setup: {
+        youtubeVideoId: "vpl3bvpg2Ck",
+        endSeconds: 34,
+      },
+      reveal: {
+        youtubeVideoId: "vpl3bvpg2Ck",
+        startSeconds: 34,
+      },
+    },
   },
   {
     id: "intermediate-2",

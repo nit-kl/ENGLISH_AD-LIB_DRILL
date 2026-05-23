@@ -7,26 +7,22 @@ import {
 } from "@english-adlib/application";
 import type { ConversationExchange } from "@english-adlib/domain";
 import { staticStageRepository } from "@english-adlib/content";
-import { WorkersAiCounterpartReplyService } from "./adapters/workers-ai-counterpart-reply-service.js";
-import { WhisperTranscriptionService } from "./adapters/whisper-transcription-service.js";
-import {
-  WorkersAiScoringService,
-  type AiBinding,
-} from "./adapters/workers-ai-scoring-service.js";
 import {
   apiErrorResponse,
   classifyScoringError,
   classifyTranscriptionError,
 } from "./lib/api-error.js";
+import {
+  createCounterpartReplyService,
+  createScoringService,
+  createTranscriptionService,
+  type ApiBindings,
+} from "./lib/ai-factory.js";
 
 const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
 const stageRepository = staticStageRepository;
 
-export type ApiBindings = {
-  AI: AiBinding;
-  SCORING_MODEL: string;
-  ALLOWED_ORIGIN?: string;
-};
+export type { ApiBindings };
 
 type WorkerEnv = { Bindings: ApiBindings };
 
@@ -87,8 +83,11 @@ app.post("/api/transcribe", async (c) => {
 
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const service = new WhisperTranscriptionService(c.env.AI);
-    const text = await service.transcribe(bytes, { language });
+    const service = createTranscriptionService(c.env);
+    const text = await service.transcribe(bytes, {
+      language,
+      mimeType: file.type || "audio/webm",
+    });
     return c.json({ text });
   } catch (error) {
     const classified = classifyTranscriptionError(error);
@@ -125,10 +124,7 @@ app.post("/api/conversation/turn", async (c) => {
   }
 
   try {
-    const replyService = new WorkersAiCounterpartReplyService(
-      c.env.AI,
-      c.env.SCORING_MODEL,
-    );
+    const replyService = createCounterpartReplyService(c.env);
     const useCase = new SubmitConversationTurnUseCase(replyService);
     const exchange = await useCase.execute({
       question,
@@ -175,7 +171,7 @@ app.post("/api/score", async (c) => {
   }
 
   try {
-    const scoringService = new WorkersAiScoringService(c.env.AI, c.env.SCORING_MODEL);
+    const scoringService = createScoringService(c.env);
     const useCase = new SubmitAnswerUseCase(scoringService);
     const feedback = await useCase.execute({
       question,

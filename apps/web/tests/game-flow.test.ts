@@ -50,8 +50,15 @@ describe("game-flow", () => {
       expect(reset.conversationExchanges).toEqual([]);
     });
 
-    it("中級お題は即回答可能", () => {
+    it("中級の動画お題も setup 未完了でリセット", () => {
       const q = getQuestionsForStage("intermediate")[0];
+      const reset = createPlayStateReset(q);
+      expect(reset.setupComplete).toBe(false);
+      expect(reset.answerTimerActive).toBe(false);
+    });
+
+    it("動画なしの中級お題は即回答可能", () => {
+      const q = getQuestionsForStage("intermediate")[1];
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(true);
       expect(reset.answerTimerActive).toBe(true);

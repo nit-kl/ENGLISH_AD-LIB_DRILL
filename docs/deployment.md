@@ -41,6 +41,22 @@ pnpm run deploy
 ```
 
 - `wrangler.toml` の `SCORING_MODEL` を必要に応じて変更
+- **Gemini フォールバック（任意・[ADR-0008](./adr/0008-gemini-ai-fallback.md)）**  
+  Workers AI 失敗時に Gemini Developer API **無料枠**へ切り替える。Google AI Studio で **請求（Billing）を有効にしない**運用を推奨。
+
+```bash
+cd apps/api
+pnpm exec wrangler secret put GEMINI_API_KEY
+# AI Studio で発行した API キー（クライアントに露出しない）
+
+# wrangler.toml または Dashboard の Variables:
+# GEMINI_FALLBACK_ENABLED = "true"
+# GEMINI_MODEL = "gemini-2.5-flash-lite"  （デフォルト済み）
+```
+
+- 無料枠では学習者のテキスト・音声が Google のプロダクト改善に利用される場合があります（[利用規約](https://ai.google.dev/gemini-api/terms?hl=ja)）。公開規模が大きくなったら有料ティアを検討してください。
+- ローカル開発: `apps/api/.dev.vars` に `GEMINI_API_KEY` と `GEMINI_FALLBACK_ENABLED=true` を設定（gitignore 済み）
+
 - 本番 CORS 用 Secret（Pages の URL が決まってから設定してもよい）:
 
 ```bash
@@ -185,6 +201,10 @@ pnpm dev:web
 ## Neuron 使用量
 
 採点1回あたりおおよそ 15〜25 Neurons（モデル・回答長による）。無料枠 10,000 Neurons/日。詳細は [ADR-0004](./adr/0004-llm-and-scoring.md)。
+
+## Gemini フォールバック（任意）
+
+Workers AI が失敗したときのみ Gemini を 1 回呼び出す。フォールバックが多いと Gemini 無料枠の **RPD（1 日あたりリクエスト数）** が先に枯渇し得る。AI Studio の **Rate Limits** で実値を確認すること。Worker ログに `[ai-fallback]` が出たら Gemini 経由で処理された印。
 
 ## ローカル E2E
 

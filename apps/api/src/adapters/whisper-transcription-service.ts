@@ -1,13 +1,14 @@
+import type { TranscriptionService } from "@english-adlib/domain";
 import type { AiBinding } from "./workers-ai-scoring-service.js";
 
 const WHISPER_MODEL = "@cf/openai/whisper";
 
-export class WhisperTranscriptionService {
+export class WhisperTranscriptionService implements TranscriptionService {
   constructor(private readonly ai: AiBinding) {}
 
   async transcribe(
     audioBytes: Uint8Array,
-    options?: { language?: string },
+    options?: { language?: string; mimeType?: string },
   ): Promise<string> {
     const input: Record<string, unknown> = {
       audio: Array.from(audioBytes),
@@ -22,7 +23,8 @@ export class WhisperTranscriptionService {
       return result.trim();
     }
 
-    const text = result.text ?? result.transcription ?? "";
+    const record = result as { text?: string; transcription?: string };
+    const text = record.text ?? record.transcription ?? "";
     if (!text.trim()) {
       throw new Error("Empty transcription from Whisper");
     }

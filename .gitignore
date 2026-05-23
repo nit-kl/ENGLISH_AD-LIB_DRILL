@@ -1,12 +1,40 @@
+# Dependencies & build
 node_modules/
 dist/
+.turbo/
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# Cloudflare Workers
 .wrangler/
+.mf/
+
+# Secrets & local env (GEMINI_API_KEY, ALLOWED_ORIGIN, etc.)
 .dev.vars
+.dev.vars.*
+!.dev.vars.example
 .env
 .env.*
 !.env.example
+
+# Logs & coverage
 *.log
-.DS_Store
 coverage/
-.turbo/
-.vite/
+
+# Playwright (e2e/)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor (optional local overrides)
+.idea/
+*.swp
+*.swo

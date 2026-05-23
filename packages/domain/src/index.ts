@@ -30,3 +30,7 @@ export {
   type ScoringService,
 } from "./ports/scoring-service.js";
 export { type StageRepository } from "./ports/stage-repository.js";
+export {
+  type TranscribeOptions,
+  type TranscriptionService,
+} from "./ports/transcription-service.js";
