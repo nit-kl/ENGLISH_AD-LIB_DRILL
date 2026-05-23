@@ -1,5 +1,5 @@
 import type { Question, ScoreFeedback, ScoringService } from "@english-adlib/domain";
-import { parseScoreFeedback } from "@english-adlib/domain";
+import { isLowQualitySceneUpdateJa, parseScoreFeedback } from "@english-adlib/domain";
 import { coerceScoreFeedbackRaw } from "../lib/llm/coerce-score-feedback.js";
 import { extractJsonFromLlmText } from "../lib/llm/extract-llm-json.js";
 
@@ -36,6 +36,8 @@ sceneUpdateJa RULES (most important for the learner):
 - FORBIDDEN: copying "Situation (before learner spoke)" text, quoting the opening line, or ending with "〜してください" (that is the task instruction, not the update)
 - FORBIDDEN: narrating how ${question.counterpart} first approached the learner if the learner already replied
 - Do NOT list grammar scores or coaching in sceneUpdateJa
+- FORBIDDEN in sceneUpdateJa: JSON objects, {"Learner said": ...} format, conversation logs, bullet lists of turns, or English sentences
+- sceneUpdateJa must be 2-4 natural Japanese sentences ONLY (no curly braces)
 
 SCORING: Never give total 0 if the learner attempted on-topic English. Minor grammar mistakes should still score roughly 40-70. Reserve below 20 for empty or completely off-topic answers.
 
@@ -78,7 +80,7 @@ function buildUserPrompt(question: Question, answerText: string): string {
     `Hints (optional expressions): ${question.hints.join(", ")}`,
     learnerSection,
     isMultiTurn
-      ? `Score the learner's English across ALL turns above. Write sceneUpdateJa describing the situation AFTER the full exchange.`
+      ? `Score the learner's English across ALL turns above. Write sceneUpdateJa as Japanese prose summarizing the scene AFTER the full exchange — NOT a JSON log of who said what.`
       : `Write sceneUpdateJa describing the situation AFTER this line.`,
   ].join("\n");
 }
@@ -164,12 +166,18 @@ function parseWorkersAiResponse(result: unknown, question: Question): ScoreFeedb
     throw new Error("Unexpected Workers AI response shape");
   }
 
-  return parseScoreFeedback(
+  const parsed = parseScoreFeedback(
     coerceScoreFeedbackRaw({
       ...(typeof raw === "object" && raw !== null ? raw : {}),
       modelAnswer: question.modelAnswer,
     }),
   );
+
+  if (isLowQualitySceneUpdateJa(parsed.sceneUpdateJa, question)) {
+    throw new Error("sceneUpdateJa must be Japanese prose, not a conversation log");
+  }
+
+  return parsed;
 }
 
 /** LLM 呼び出しと生 ScoreFeedback パースのみ（後処理は application 層） */

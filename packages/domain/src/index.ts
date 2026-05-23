@@ -15,7 +15,7 @@ export {
   getSceneUpdateFallback,
   resolveSceneUpdateJa,
 } from "./lib/scene-update-fallback.js";
-export { looksLikeSetupRepeat } from "./lib/scene-update-quality.js";
+export { looksLikeMalformedSceneUpdate, looksLikeSetupRepeat, isLowQualitySceneUpdateJa } from "./lib/scene-update-quality.js";
 export {
   formatConversationTranscript,
   isFinalConversationTurn,

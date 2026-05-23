@@ -49,3 +49,31 @@ export function looksLikeSetupRepeat(sceneUpdateJa: string, question: Question):
 
   return false;
 }
+
+/** LLM が会話ログ・JSON オブジェクトを sceneUpdateJa に入れてしまった */
+export function looksLikeMalformedSceneUpdate(sceneUpdateJa: string): boolean {
+  const scene = sceneUpdateJa.trim();
+  if (scene.length < 8) return false;
+
+  if (scene.startsWith("{") && scene.endsWith("}")) return true;
+
+  if (/"\s*Learner said\s*"/i.test(scene)) return true;
+
+  const saidKeyMatches = scene.match(/"\s*[^"]*\s+said\s*"\s*:/gi) ?? [];
+  if (saidKeyMatches.length >= 1) return true;
+
+  const englishTokens = scene.match(/\b[A-Za-z]{4,}\b/g) ?? [];
+  if (englishTokens.length >= 4) return true;
+
+  return false;
+}
+
+export function isLowQualitySceneUpdateJa(
+  sceneUpdateJa: string,
+  question: Question,
+): boolean {
+  return (
+    looksLikeSetupRepeat(sceneUpdateJa, question) ||
+    looksLikeMalformedSceneUpdate(sceneUpdateJa)
+  );
+}

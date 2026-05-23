@@ -1,5 +1,5 @@
 import type { Question } from "../entities/question.js";
-import { looksLikeSetupRepeat } from "./scene-update-quality.js";
+import { isLowQualitySceneUpdateJa } from "./scene-update-quality.js";
 
 function extractNameFromAnswer(answerText: string): string | null {
   const m = answerText.match(/\bI['']?m\s+([A-Za-z]+)/i);
@@ -48,7 +48,7 @@ export function resolveSceneUpdateJa(
   answerText: string,
 ): string {
   const trimmed = sceneUpdateJa.trim();
-  if (trimmed.length >= 12 && !looksLikeSetupRepeat(trimmed, question)) {
+  if (trimmed.length >= 12 && !isLowQualitySceneUpdateJa(trimmed, question)) {
     return trimmed;
   }
   return buildSceneUpdateFallback(question, answerText);

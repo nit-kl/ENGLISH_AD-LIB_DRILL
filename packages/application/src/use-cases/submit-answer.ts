@@ -32,13 +32,15 @@ export class SubmitAnswerUseCase {
       answerText: transcript,
     });
 
+    const fallbackContext = trimmedTurns.length > 1 ? transcript : lastTurn;
+
     const adjusted = applyScoreFloor(raw, lastTurn);
     return {
       ...adjusted,
       sceneUpdateJa: resolveSceneUpdateJa(
         adjusted.sceneUpdateJa,
         input.question,
-        lastTurn,
+        fallbackContext,
       ),
     };
   }

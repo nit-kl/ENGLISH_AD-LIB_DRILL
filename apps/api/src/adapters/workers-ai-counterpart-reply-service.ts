@@ -4,6 +4,7 @@ import type {
   CounterpartReplyService,
   Question,
 } from "@english-adlib/domain";
+import { looksLikeMalformedSceneUpdate } from "@english-adlib/domain";
 import { extractJsonFromLlmText } from "../lib/llm/extract-llm-json.js";
 import type { AiBinding } from "./workers-ai-scoring-service.js";
 
@@ -27,10 +28,11 @@ RULES for counterpartLineEn:
 - Do NOT score or coach the learner
 
 RULES for sceneUpdateJa:
-- Japanese only
+- Japanese only (2-3 natural sentences)
 - Describe what happened AFTER the learner's latest line
 - Mention something from the learner's answer
 - Do NOT repeat the situation setup or say "〜してください"
+- FORBIDDEN: JSON objects, {"Learner said": ...} format, or English conversation logs
 
 Respond with ONLY valid JSON:
 ${JSON_SCHEMA_PROMPT}`;
@@ -89,6 +91,9 @@ function parseCounterpartReply(result: unknown): CounterpartReply {
   }
   if (sceneUpdateJa.length < 8) {
     throw new Error("sceneUpdateJa is missing or too short");
+  }
+  if (looksLikeMalformedSceneUpdate(sceneUpdateJa)) {
+    throw new Error("sceneUpdateJa must be Japanese prose, not a conversation log");
   }
 
   return { counterpartLineEn, sceneUpdateJa };

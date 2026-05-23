@@ -126,6 +126,35 @@ describe("SubmitAnswerUseCase", () => {
     expect(result.sceneUpdateJa.length).toBeGreaterThan(12);
   });
 
+  it("JSON 会話ログの sceneUpdateJa はフォールバックする", async () => {
+    const useCase = new SubmitAnswerUseCase(
+      new FakeScoringService({
+        total: 75,
+        fluency: 75,
+        grammar: 75,
+        vocabulary: 75,
+        relevance: 75,
+        sceneUpdateJa:
+          '{"Learner said": "hello", "フロント係 said": "予約記録がないと言われました"}',
+        goodPoints: ["良い"],
+        improvements: ["改善"],
+        modelAnswer: "I have a reservation.",
+      }),
+    );
+    const result = await useCase.execute({
+      question: {
+        ...sampleQuestion,
+        id: "intermediate-1",
+        stageKey: "intermediate",
+        title: "ホテルでトラブル",
+        counterpart: "フロント係",
+      },
+      userTurns: ["hello", "This is unacceptable"],
+    });
+    expect(result.sceneUpdateJa).not.toContain("Learner said");
+    expect(result.sceneUpdateJa).toContain("フロント");
+  });
+
   it("LLM が total 0 でも英語回答なら点数を付ける", async () => {
     const useCase = new SubmitAnswerUseCase(
       new FakeScoringService({
