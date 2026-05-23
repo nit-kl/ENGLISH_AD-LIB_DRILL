@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { ApiClientError, transcribeAudio } from "../../infrastructure/scoring-api-client";
+import { ApiClientError } from "../../infrastructure/api-error.js";
+import { transcribeAudio } from "../../infrastructure/scoring-api-client";
 import type { VoiceInputLanguage } from "./useVoiceInput";
 
 export type UseWhisperRecordingOptions = {

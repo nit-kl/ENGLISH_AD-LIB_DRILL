@@ -1,49 +1,24 @@
+import type { ConversationExchange } from "@english-adlib/domain";
 import { parseScoreFeedback, type ScoreFeedback } from "@english-adlib/domain";
+import { ApiClientError, parseApiError } from "./api-error.js";
+
+export { ApiClientError, type ApiErrorCode } from "./api-error.js";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
-
-export type ApiErrorCode =
-  | "QUOTA_EXCEEDED"
-  | "SCORING_FAILED"
-  | "TRANSCRIPTION_FAILED"
-  | "INVALID_REQUEST"
-  | "NOT_FOUND";
-
-export class ApiClientError extends Error {
-  constructor(
-    message: string,
-    readonly code: ApiErrorCode,
-    readonly status: number,
-    readonly retryable: boolean,
-  ) {
-    super(message);
-    this.name = "ApiClientError";
-  }
-}
-
-async function parseApiError(res: Response): Promise<ApiClientError> {
-  const data = (await res.json().catch(() => ({}))) as {
-    error?: string;
-    code?: ApiErrorCode;
-    retryable?: boolean;
-  };
-  return new ApiClientError(
-    data.error ?? `Request failed (${res.status})`,
-    data.code ?? "SCORING_FAILED",
-    res.status,
-    data.retryable ?? res.status >= 500,
-  );
-}
 
 /** POST /api/score — サーバー側で後処理済みの feedback を返す */
 export async function scoreAnswer(
   questionId: string,
-  answerText: string,
+  userTurns: string | string[],
 ): Promise<ScoreFeedback> {
+  const turns = (Array.isArray(userTurns) ? userTurns : [userTurns]).map((t) =>
+    t.trim(),
+  ).filter(Boolean);
+
   const res = await fetch(`${baseUrl}/api/score`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ questionId, answerText }),
+    body: JSON.stringify({ questionId, userTurns: turns }),
   });
   if (!res.ok) throw await parseApiError(res);
   const data = (await res.json()) as { feedback?: unknown };
@@ -82,4 +57,25 @@ export async function transcribeAudio(
     throw new ApiClientError("Empty transcription", "TRANSCRIPTION_FAILED", 502, true);
   }
   return data.text.trim();
+}
+
+/** POST /api/conversation/turn — 中間ターンの相手返答 */
+export async function submitConversationTurn(input: {
+  questionId: string;
+  userText: string;
+  priorExchanges: readonly ConversationExchange[];
+  turnIndex: number;
+  totalTurns: number;
+}): Promise<ConversationExchange> {
+  const res = await fetch(`${baseUrl}/api/conversation/turn`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) throw await parseApiError(res);
+  const data = (await res.json()) as { exchange?: ConversationExchange };
+  if (!data.exchange?.userText || !data.exchange.counterpartLineEn) {
+    throw new ApiClientError("Invalid conversation response", "SCORING_FAILED", 502, true);
+  }
+  return data.exchange;
 }

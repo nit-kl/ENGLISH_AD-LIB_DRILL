@@ -5,6 +5,7 @@ export const intermediateStageMeta = {
   label: "中級",
   sublabel: "Intermediate",
   desc: "日常会話レベル",
+  conversationTurns: 2,
 };
 
 export const intermediateQuestions: Question[] = [

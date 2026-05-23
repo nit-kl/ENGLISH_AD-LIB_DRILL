@@ -5,6 +5,7 @@ export const advancedStageMeta = {
   label: "上級",
   sublabel: "Advanced",
   desc: "ビジネス&議論レベル",
+  conversationTurns: 3,
 };
 
 export const advancedQuestions: Question[] = [

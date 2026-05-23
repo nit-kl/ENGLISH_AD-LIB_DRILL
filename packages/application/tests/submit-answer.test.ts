@@ -55,7 +55,7 @@ describe("SubmitAnswerUseCase", () => {
       }),
     );
     await expect(
-      useCase.execute({ question: sampleQuestion, answerText: "   " }),
+      useCase.execute({ question: sampleQuestion, userTurns: ["   "] }),
     ).rejects.toThrow(/empty/i);
   });
 
@@ -75,7 +75,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      answerText: "I'd like a tall iced latte please",
+      userTurns: ["I'd like a tall iced latte please"],
     });
     expect(result.total).toBe(82);
     expect(result.goodPoints[0]).toBe("良いテンポ");
@@ -98,7 +98,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: beginner2,
-      answerText: "Nice to meet you. I'm Leo, I'm from Japan.",
+      userTurns: ["Nice to meet you. I'm Leo, I'm from Japan."],
     });
     expect(result.sceneUpdateJa).not.toContain("自己紹介してください");
     expect(result.sceneUpdateJa).toMatch(/Leo|レオ|日本|サラ|Sarah/i);
@@ -120,7 +120,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      answerText: "I'd like to tall latte",
+      userTurns: ["I'd like to tall latte"],
     });
     expect(result.sceneUpdateJa).toContain("店員");
     expect(result.sceneUpdateJa.length).toBeGreaterThan(12);
@@ -142,7 +142,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      answerText: "I'd like to tall latte",
+      userTurns: ["I'd like to tall latte"],
     });
     expect(result.total).toBeGreaterThanOrEqual(30);
   });

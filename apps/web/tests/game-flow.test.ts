@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   createPlayStateReset,
+  getConversationTurnsForStage,
   getQuestionsForStage,
   initialSetupComplete,
+  isOnFinalTurn,
   markQuestionComplete,
 } from "../src/application/game-flow.js";
 
@@ -45,6 +47,7 @@ describe("game-flow", () => {
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(false);
       expect(reset.timeLeft).toBe(60);
+      expect(reset.conversationExchanges).toEqual([]);
     });
 
     it("中級お題は即回答可能", () => {
@@ -52,6 +55,34 @@ describe("game-flow", () => {
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(true);
       expect(reset.answerTimerActive).toBe(true);
+    });
+  });
+
+  describe("conversation turns", () => {
+    it("ステージごとの必要ターン数", () => {
+      expect(getConversationTurnsForStage("beginner")).toBe(1);
+      expect(getConversationTurnsForStage("intermediate")).toBe(2);
+      expect(getConversationTurnsForStage("advanced")).toBe(3);
+      expect(getConversationTurnsForStage("legendary")).toBe(4);
+    });
+
+    it("中級は1回目は中間ターン", () => {
+      expect(isOnFinalTurn([], "intermediate")).toBe(false);
+    });
+
+    it("中級は2回目が最終ターン", () => {
+      expect(
+        isOnFinalTurn(
+          [
+            {
+              userText: "Hi",
+              counterpartLineEn: "Hello",
+              sceneUpdateJa: "挨拶が交わされました。",
+            },
+          ],
+          "intermediate",
+        ),
+      ).toBe(true);
     });
   });
 });

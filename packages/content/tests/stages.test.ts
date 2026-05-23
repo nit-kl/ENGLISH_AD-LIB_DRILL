@@ -22,4 +22,11 @@ describe("stages data", () => {
       }
     }
   });
+
+  it("ステージごとに会話ターン数が増える", () => {
+    expect(STAGES.beginner.conversationTurns).toBe(1);
+    expect(STAGES.intermediate.conversationTurns).toBe(2);
+    expect(STAGES.advanced.conversationTurns).toBe(3);
+    expect(STAGES.legendary.conversationTurns).toBe(4);
+  });
 });

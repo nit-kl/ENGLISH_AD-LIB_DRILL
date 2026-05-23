@@ -1,3 +1,7 @@
+export {
+  type ConversationExchange,
+  type CounterpartReply,
+} from "./entities/conversation.js";
 export { countWords, type Question } from "./entities/question.js";
 export {
   hasQuestionMedia,
@@ -12,7 +16,15 @@ export {
   resolveSceneUpdateJa,
 } from "./lib/scene-update-fallback.js";
 export { looksLikeSetupRepeat } from "./lib/scene-update-quality.js";
+export {
+  formatConversationTranscript,
+  isFinalConversationTurn,
+} from "./lib/conversation-transcript.js";
 export { applyScoreFloor } from "./lib/score-adjustment.js";
+export {
+  type CounterpartReplyInput,
+  type CounterpartReplyService,
+} from "./ports/counterpart-reply-service.js";
 export {
   type ScoreAnswerInput,
   type ScoringService,

@@ -49,10 +49,22 @@
 |------|--------|
 | ステージ・問題データ | `packages/content` |
 | 採点後処理（floor / sceneUpdate 品質） | `packages/application`（SubmitAnswerUseCase） |
+| 中間ターンの相手返答 | `packages/application`（SubmitConversationTurnUseCase） + `apps/api`（WorkersAiCounterpartReplyService） |
 | LLM 呼び出し・JSON パース | `apps/api`（WorkersAiScoringService） |
 | HTTP 通信 | `apps/web/infrastructure`（scoring-api-client） |
 | 画面遷移・タイマー | `apps/web/application`（useGameFlow） |
 | UI テーマ（Tailwind colorClass） | `apps/web/presentation/config` |
+
+## 会話ターン（ステージ難易度）
+
+| ステージ | 採点までの学習者発話回数 |
+|----------|--------------------------|
+| 初級 | 1（従来どおり） |
+| 中級 | 2 |
+| 上級 | 3 |
+| 超人級 | 4 |
+
+中間ターンは `POST /api/conversation/turn` で相手役の返答を取得し、最終ターンで `POST /api/score` に全発話を渡して採点する。
 
 ## リポジトリ構成
 

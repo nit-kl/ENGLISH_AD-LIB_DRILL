@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { ApiClientError, scoreAnswer } from "../src/infrastructure/scoring-api-client.js";
+import { ApiClientError } from "../src/infrastructure/api-error.js";
+import { scoreAnswer } from "../src/infrastructure/scoring-api-client.js";
 
 /** 責務: HTTP 通信とレスポンスの型検証のみ */
 describe("scoreAnswer", () => {

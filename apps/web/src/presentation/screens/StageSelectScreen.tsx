@@ -46,6 +46,9 @@ export function StageSelectScreen({ onBack, onSelect }: Props) {
               <p className="text-white/70 text-xs tracking-widest mb-1">{stage.sublabel.toUpperCase()}</p>
               <p className="text-white/90 text-sm mb-3">
                 {stage.desc} · 全{stage.questions.length}問
+                {stage.conversationTurns > 1 && (
+                  <> · 会話{stage.conversationTurns}回</>
+                )}
               </p>
               <div className="flex items-center gap-2 text-white font-bold text-sm">
                 お題一覧へ <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />

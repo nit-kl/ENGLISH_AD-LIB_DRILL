@@ -1,14 +1,20 @@
 import { useCallback, useState } from "react";
 import { STAGES } from "@english-adlib/content";
-import type { Question, ScoreFeedback, StageKey } from "@english-adlib/domain";
+import type { ConversationExchange, Question, ScoreFeedback, StageKey } from "@english-adlib/domain";
+import { ApiClientError } from "../infrastructure/api-error.js";
 import {
-  ApiClientError,
   scoreAnswer,
+  submitConversationTurn,
 } from "../infrastructure/scoring-api-client.js";
 import { useVoiceInput } from "../presentation/hooks/useVoiceInput.js";
 import {
+  createMidTurnReset,
   createPlayStateReset,
+  formatUserAnswerForDisplay,
+  getConversationTurnsForStage,
+  getCurrentTurnIndex,
   getQuestionsForStage,
+  isOnFinalTurn,
   markQuestionComplete,
   type Screen,
 } from "./game-flow.js";
@@ -29,6 +35,9 @@ export function useGameFlow() {
   const [submitError, setSubmitError] = useState<ApiClientError | null>(null);
   const [setupComplete, setSetupComplete] = useState(false);
   const [answerTimerActive, setAnswerTimerActive] = useState(false);
+  const [conversationExchanges, setConversationExchanges] = useState<
+    ConversationExchange[]
+  >([]);
   const [stageCompletedIds, setStageCompletedIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -38,6 +47,10 @@ export function useGameFlow() {
   }, []);
 
   const voice = useVoiceInput(appendTranscript, { language: "en" });
+
+  const totalConversationTurns = getConversationTurnsForStage(currentStage);
+  const currentTurnIndex = getCurrentTurnIndex(conversationExchanges);
+  const onFinalTurn = isOnFinalTurn(conversationExchanges, currentStage);
 
   const resetPlayState = useCallback(
     (question?: Question) => {
@@ -50,6 +63,7 @@ export function useGameFlow() {
       setSubmitError(reset.submitError);
       setSetupComplete(reset.setupComplete);
       setAnswerTimerActive(reset.answerTimerActive);
+      setConversationExchanges(reset.conversationExchanges);
       voice.stop();
     },
     [voice],
@@ -61,25 +75,58 @@ export function useGameFlow() {
     const q = questions[questionIndex];
     if (!q) return;
 
+    const trimmed = userInput.trim();
+    if (!trimmed) return;
+
     setIsSubmitting(true);
     setSubmitError(null);
     voice.stop();
 
     try {
-      const result = await scoreAnswer(q.id, userInput || "...");
-      setScore(result.total);
-      setFeedback(result);
-      setShowScoring(true);
+      if (onFinalTurn) {
+        const userTurns = [
+          ...conversationExchanges.map((e) => e.userText),
+          trimmed,
+        ];
+        const result = await scoreAnswer(q.id, userTurns);
+        setScore(result.total);
+        setFeedback(result);
+        setShowScoring(true);
+      } else {
+        const exchange = await submitConversationTurn({
+          questionId: q.id,
+          userText: trimmed,
+          priorExchanges: conversationExchanges,
+          turnIndex: currentTurnIndex,
+          totalTurns: totalConversationTurns,
+        });
+        setConversationExchanges((prev) => [...prev, exchange]);
+        const midReset = createMidTurnReset();
+        setUserInput(midReset.userInput);
+        setTimeLeft(midReset.timeLeft);
+        setSubmitError(midReset.submitError);
+      }
     } catch (e) {
       setSubmitError(
         e instanceof ApiClientError
           ? e
-          : new ApiClientError("採点に失敗しました", "SCORING_FAILED", 502, true),
+          : new ApiClientError("送信に失敗しました", "SCORING_FAILED", 502, true),
       );
     } finally {
       setIsSubmitting(false);
     }
-  }, [showScoring, isSubmitting, currentStage, questionIndex, userInput, voice]);
+  }, [
+    showScoring,
+    isSubmitting,
+    currentStage,
+    questionIndex,
+    userInput,
+    voice,
+    onFinalTurn,
+    conversationExchanges,
+    currentTurnIndex,
+    totalConversationTurns,
+  ]);
 
   const handleTimerTick = useCallback(() => {
     setTimeLeft((v) => v - 1);
@@ -153,6 +200,9 @@ export function useGameFlow() {
 
   const questions = getQuestionsForStage(currentStage);
   const currentQuestion = questions[questionIndex];
+  const displayedUserAnswer = showScoring
+    ? formatUserAnswerForDisplay(conversationExchanges, userInput)
+    : userInput;
 
   return {
     screen,
@@ -170,6 +220,11 @@ export function useGameFlow() {
     submitError,
     setupComplete,
     answerTimerActive,
+    conversationExchanges,
+    totalConversationTurns,
+    currentTurnIndex,
+    onFinalTurn,
+    displayedUserAnswer,
     stageCompletedIds,
     voice,
     questions,

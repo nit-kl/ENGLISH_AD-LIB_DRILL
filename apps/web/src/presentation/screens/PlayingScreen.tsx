@@ -1,6 +1,12 @@
 import { useCallback } from "react";
-import { ChevronRight, Home, Mic, MicOff, Send } from "lucide-react";
-import { countWords, hasQuestionMedia, type Question, type ScoreFeedback } from "@english-adlib/domain";
+import { ChevronRight, Home, MessageCircle, Mic, MicOff, Send } from "lucide-react";
+import {
+  countWords,
+  hasQuestionMedia,
+  type ConversationExchange,
+  type Question,
+  type ScoreFeedback,
+} from "@english-adlib/domain";
 import type { ApiClientError } from "../../infrastructure/scoring-api-client";
 import { ScoreResultPanel } from "../components/ScoreResultPanel";
 import { SubmitErrorBanner } from "../components/SubmitErrorBanner";
@@ -23,9 +29,14 @@ type Props = {
   onSetupComplete: () => void;
   userInput: string;
   onInputChange: (v: string) => void;
+  conversationExchanges: ConversationExchange[];
+  totalConversationTurns: number;
+  currentTurnIndex: number;
+  onFinalTurn: boolean;
   showScoring: boolean;
   feedback: ScoreFeedback | null;
   animatedScore: number;
+  displayedUserAnswer: string;
   isSubmitting: boolean;
   submitError: ApiClientError | null;
   voice: Voice;
@@ -48,9 +59,14 @@ export function PlayingScreen({
   onSetupComplete,
   userInput,
   onInputChange,
+  conversationExchanges,
+  totalConversationTurns,
+  currentTurnIndex,
+  onFinalTurn,
   showScoring,
   feedback,
   animatedScore,
+  displayedUserAnswer,
   isSubmitting,
   submitError,
   voice,
@@ -63,6 +79,14 @@ export function PlayingScreen({
   const videoMode = hasQuestionMedia(q);
   const canAnswer = !videoMode || setupComplete;
   const timerVisible = answerTimerActive && canAnswer && !showScoring;
+  const multiTurn = totalConversationTurns > 1;
+  const submitLabel = isSubmitting
+    ? onFinalTurn
+      ? "採点中…"
+      : "送信中…"
+    : onFinalTurn
+      ? "採点する"
+      : "返答する";
 
   const handleSetupComplete = useCallback(() => {
     onSetupComplete();
@@ -105,6 +129,12 @@ export function PlayingScreen({
                 </>
               )}
             </div>
+            {multiTurn && !showScoring && (
+              <div className="px-3 py-2 bg-emerald-500/20 backdrop-blur-md rounded-full border border-emerald-400/30 text-emerald-100 text-xs font-bold flex items-center gap-1">
+                <MessageCircle className="w-3.5 h-3.5" />
+                会話 {currentTurnIndex + 1}/{totalConversationTurns}
+              </div>
+            )}
             {timerVisible && (
               <div
                 className={`px-3 md:px-4 py-2 backdrop-blur-md rounded-full border-2 font-black text-lg md:text-xl ${
@@ -138,10 +168,40 @@ export function PlayingScreen({
           </div>
         )}
 
-        {!videoMode && !showScoring && (
+        {!videoMode && !showScoring && conversationExchanges.length === 0 && (
           <div className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl border border-white/20 p-6 md:p-8 mb-5 shadow-2xl">
             <div className="text-xs font-bold tracking-widest text-yellow-300 mb-2">お題</div>
             <p className="text-white text-base md:text-lg leading-relaxed">{q.situation}</p>
+            {multiTurn && (
+              <p className="text-purple-200 text-sm mt-4">
+                このステージは <span className="text-yellow-300 font-bold">{totalConversationTurns}回</span> 英語で返答してから採点されます。
+              </p>
+            )}
+          </div>
+        )}
+
+        {conversationExchanges.length > 0 && !showScoring && (
+          <div className="space-y-3 mb-5">
+            {conversationExchanges.map((exchange, index) => (
+              <div
+                key={`${index}-${exchange.userText.slice(0, 24)}`}
+                className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4 space-y-3"
+              >
+                <div>
+                  <div className="text-xs font-bold text-yellow-300 mb-1">あなた（{index + 1}回目）</div>
+                  <p className="text-white text-sm leading-relaxed">{exchange.userText}</p>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-emerald-300 mb-1">{q.counterpart}</div>
+                  <p className="text-purple-100 text-sm italic leading-relaxed">
+                    &ldquo;{exchange.counterpartLineEn}&rdquo;
+                  </p>
+                  <p className="text-purple-200/90 text-xs mt-2 leading-relaxed">
+                    {exchange.sceneUpdateJa}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -151,11 +211,20 @@ export function PlayingScreen({
               canAnswer ? "opacity-100" : "opacity-40 pointer-events-none"
             }`}
           >
-            {videoMode && setupComplete && (
+            {videoMode && setupComplete && conversationExchanges.length === 0 && (
               <p className="text-center text-yellow-200 font-bold text-sm mb-4">さあ、英語で答えて</p>
             )}
+            {multiTurn && conversationExchanges.length > 0 && (
+              <p className="text-center text-emerald-200 font-bold text-sm mb-4">
+                {q.counterpart}の返答を受けて、続きを英語で
+              </p>
+            )}
             <div className="flex justify-between mb-3">
-              <span className="text-purple-200 text-sm font-bold">あなたの回答（英語で）</span>
+              <span className="text-purple-200 text-sm font-bold">
+                {multiTurn
+                  ? `あなたの返答（${currentTurnIndex + 1}/${totalConversationTurns}）`
+                  : "あなたの回答（英語で）"}
+              </span>
               <span className="text-purple-300 text-xs">{countWords(userInput)} 単語</span>
             </div>
             <textarea
@@ -198,7 +267,7 @@ export function PlayingScreen({
                 disabled={!canAnswer || !userInput.trim() || isSubmitting || voice.isBusy}
                 className="flex items-center gap-2 px-6 md:px-8 py-3 bg-gradient-to-r from-yellow-300 to-amber-400 text-purple-950 font-black rounded-full hover:scale-105 transition disabled:opacity-40 shadow-lg text-sm"
               >
-                {isSubmitting ? "採点中…" : "回答する"}
+                {submitLabel}
                 <Send className="w-4 h-4" />
               </button>
             </div>
@@ -209,7 +278,7 @@ export function PlayingScreen({
               feedback={feedback}
               modelAnswer={q.modelAnswer}
               animatedScore={animatedScore}
-              userAnswer={userInput.trim() || "..."}
+              userAnswer={displayedUserAnswer.trim() || "..."}
               nextLabel={scoringNextLabel}
               onNext={scoringNext}
               deferModelAndTips={videoMode}

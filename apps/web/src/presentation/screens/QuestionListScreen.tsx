@@ -65,6 +65,9 @@ export function QuestionListScreen({
           <p className="text-white/70 text-xs tracking-widest mb-1">{stage.sublabel.toUpperCase()}</p>
           <p className="text-white/90 text-sm">
             {stage.desc} · 全{totalCount}問
+            {stage.conversationTurns > 1 && (
+              <> · 会話{stage.conversationTurns}回</>
+            )}
           </p>
           <p className="text-white/80 text-xs mt-3 font-bold">
             挑戦済み {completedCount} / {totalCount}

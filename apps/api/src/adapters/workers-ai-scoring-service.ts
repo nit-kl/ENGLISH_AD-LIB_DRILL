@@ -65,14 +65,21 @@ BAD (never): 「サラが Hi と話しかけてきました。自己紹介して
 }
 
 function buildUserPrompt(question: Question, answerText: string): string {
+  const isMultiTurn = answerText.includes("Turn ") && answerText.includes("Learner):");
+  const learnerSection = isMultiTurn
+    ? `Learner's lines across the conversation:\n${answerText}`
+    : `Learner said: ${answerText}`;
+
   return [
     `Title: ${question.title} (${question.titleEn})`,
     `Learner role: ${question.role}`,
     `Counterpart: ${question.counterpart}`,
     `Situation (before learner spoke): ${question.situation}`,
     `Hints (optional expressions): ${question.hints.join(", ")}`,
-    `Learner said: ${answerText}`,
-    `Write sceneUpdateJa describing the situation AFTER this line.`,
+    learnerSection,
+    isMultiTurn
+      ? `Score the learner's English across ALL turns above. Write sceneUpdateJa describing the situation AFTER the full exchange.`
+      : `Write sceneUpdateJa describing the situation AFTER this line.`,
   ].join("\n");
 }
 

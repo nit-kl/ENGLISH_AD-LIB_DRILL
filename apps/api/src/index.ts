@@ -1,7 +1,13 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { ListStagesUseCase, SubmitAnswerUseCase } from "@english-adlib/application";
+import {
+  ListStagesUseCase,
+  SubmitAnswerUseCase,
+  SubmitConversationTurnUseCase,
+} from "@english-adlib/application";
+import type { ConversationExchange } from "@english-adlib/domain";
 import { staticStageRepository } from "@english-adlib/content";
+import { WorkersAiCounterpartReplyService } from "./adapters/workers-ai-counterpart-reply-service.js";
 import { WhisperTranscriptionService } from "./adapters/whisper-transcription-service.js";
 import {
   WorkersAiScoringService,
@@ -44,6 +50,7 @@ app.get("/api/stages", (c) => {
     label: stage.label,
     sublabel: stage.sublabel,
     desc: stage.desc,
+    conversationTurns: stage.conversationTurns,
     questionCount: stage.questions.length,
     questions: stage.questions,
   }));
@@ -94,10 +101,13 @@ app.post("/api/transcribe", async (c) => {
   }
 });
 
-app.post("/api/score", async (c) => {
+app.post("/api/conversation/turn", async (c) => {
   const body = await c.req.json<{
     questionId: string;
-    answerText: string;
+    userText: string;
+    priorExchanges?: ConversationExchange[];
+    turnIndex: number;
+    totalTurns: number;
   }>();
 
   const question = stageRepository.getQuestionById(body.questionId);
@@ -105,10 +115,60 @@ app.post("/api/score", async (c) => {
     return apiErrorResponse("NOT_FOUND", "Question not found", 404, false);
   }
 
-  if (!body.answerText?.trim()) {
+  if (!body.userText?.trim()) {
     return apiErrorResponse(
       "INVALID_REQUEST",
-      "answerText is required",
+      "userText is required",
+      400,
+      false,
+    );
+  }
+
+  try {
+    const replyService = new WorkersAiCounterpartReplyService(
+      c.env.AI,
+      c.env.SCORING_MODEL,
+    );
+    const useCase = new SubmitConversationTurnUseCase(replyService);
+    const exchange = await useCase.execute({
+      question,
+      userText: body.userText,
+      priorExchanges: body.priorExchanges ?? [],
+      turnIndex: body.turnIndex,
+      totalTurns: body.totalTurns,
+    });
+    return c.json({ exchange });
+  } catch (error) {
+    const classified = classifyScoringError(error);
+    return apiErrorResponse(
+      classified.code,
+      classified.message,
+      classified.status,
+      classified.retryable,
+    );
+  }
+});
+
+app.post("/api/score", async (c) => {
+  const body = await c.req.json<{
+    questionId: string;
+    answerText?: string;
+    userTurns?: string[];
+  }>();
+
+  const question = stageRepository.getQuestionById(body.questionId);
+  if (!question) {
+    return apiErrorResponse("NOT_FOUND", "Question not found", 404, false);
+  }
+
+  const userTurns =
+    body.userTurns?.map((t) => t.trim()).filter(Boolean) ??
+    (body.answerText?.trim() ? [body.answerText.trim()] : []);
+
+  if (userTurns.length === 0) {
+    return apiErrorResponse(
+      "INVALID_REQUEST",
+      "userTurns or answerText is required",
       400,
       false,
     );
@@ -119,7 +179,7 @@ app.post("/api/score", async (c) => {
     const useCase = new SubmitAnswerUseCase(scoringService);
     const feedback = await useCase.execute({
       question,
-      answerText: body.answerText,
+      userTurns,
     });
     return c.json({ feedback });
   } catch (error) {
