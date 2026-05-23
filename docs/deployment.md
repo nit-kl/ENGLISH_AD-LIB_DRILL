@@ -1,32 +1,168 @@
 # デプロイ手順（Cloudflare）
 
+## 方針
+
+**GitHub の `main` ブランチへの push（PR マージ含む）をトリガーに、Cloudflare 側で自動ビルド・デプロイする。**
+
+| 対象 | Cloudflare 機能 | トリガー |
+|------|-----------------|----------|
+| Web（フロント） | **Pages**（Git 連携） | `main` への push |
+| API（Worker） | **Workers Builds**（Git 連携） | `main` への push |
+| 品質チェック | **GitHub Actions**（CI のみ） | push / PR |
+
+デプロイは GitHub Actions では行わない。`.github/workflows/ci.yml` はテスト（unit / e2e）のみ実行する。
+
 ## 前提
 
 - Cloudflare アカウント
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) ログイン済み
+- GitHub リポジトリへの Admin 権限（Cloudflare GitHub App のインストール用）
 - **Node.js 24 LTS**（基準 v24.15.0、`winget install OpenJS.NodeJS.LTS`。Wrangler 4）
+- Workers AI が有効なアカウントであること
 
-## API（Workers）
+---
+
+## 初回セットアップ（1 回だけ）
+
+### 1. Cloudflare GitHub App をインストール
+
+1. [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Workers & Pages**
+2. **Create** → **Pages** → **Connect to Git**（Workers でも同じ App を使う）
+3. **Add account** → GitHub で **Cloudflare Workers and Pages** をインストール
+4. 対象リポジトリ（`ENGLISH_AD-LIB_DRILL`）へのアクセスを許可
+
+### 2. API（Worker）を初回作成し Secret を設定
+
+Workers Builds を接続する前に、Worker 本体と Secret を用意する。
 
 ```bash
 cd apps/api
-pnpm deploy
+pnpm install   # リポジトリルートから pnpm install --frozen-lockfile でも可
+pnpm run deploy
 ```
 
-- Workers AI が有効なアカウントであること
 - `wrangler.toml` の `SCORING_MODEL` を必要に応じて変更
+- 本番 CORS 用 Secret（Pages の URL が決まってから設定してもよい）:
 
-本番 CORS: `wrangler secret put ALLOWED_ORIGIN` で Pages の URL を設定（例 `https://english-adlib.pages.dev`）
+```bash
+cd apps/api
+pnpm exec wrangler secret put ALLOWED_ORIGIN
+# 例: https://english-adlib-drill.pages.dev
+```
 
-## Web（Pages）
+デプロイ後、Worker URL（例 `https://english-adlib-api.<account>.workers.dev`）を控える。
 
-1. Cloudflare Dashboard → Workers & Pages → Create → Pages → Connect Git
-2. ビルド設定:
-   - **Root directory**: `apps/web`
-   - **Build command**: `pnpm install && pnpm build`
-   - **Build output**: `dist`
-3. 環境変数:
-   - `VITE_API_BASE_URL` = Worker の URL（末尾スラッシュなし）
+### 3. API — Workers Builds で Git 連携
+
+1. Dashboard → **Workers & Pages** → Worker **`english-adlib-api`** を選択
+2. **Settings** → **Builds** → **Connect**
+3. 以下を設定:
+
+| 項目 | 値 |
+|------|-----|
+| Git repository | 本リポジトリ |
+| Production branch | `main` |
+| Root directory | `/`（リポジトリルート） |
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter @english-adlib/api build` |
+| Deploy command | `pnpm --filter @english-adlib/api exec wrangler deploy` |
+
+4. **Save** 後、`main` へ push してビルドが走ることを確認
+
+**モノレポのビルド監視（任意）**  
+Settings → Builds → **Build watch paths** で、API 変更時だけビルドするよう絞り込める。
+
+- Include: `apps/api/**`, `packages/**`
+- Exclude: `apps/web/**`, `docs/**`, `e2e/**`
+
+### 4. Web — Pages で Git 連携
+
+1. Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+2. 同じ GitHub リポジトリを選択
+3. プロジェクト名例: **`english-adlib-drill`**
+4. ビルド設定:
+
+| 項目 | 値 |
+|------|-----|
+| Production branch | `main` |
+| Root directory | `/`（リポジトリルート） |
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter @english-adlib/web build` |
+| Build output directory | `apps/web/dist` |
+
+5. **Environment variables**（Production）:
+
+| 変数 | 値 |
+|------|-----|
+| `VITE_API_BASE_URL` | 手順 2 で控えた Worker URL（末尾スラッシュなし） |
+
+6. **Save and Deploy**
+
+**モノレポのビルド監視（任意）**
+
+- Include: `apps/web/**`, `packages/**`
+- Exclude: `apps/api/**`, `docs/**`, `e2e/**`
+
+### 5. CORS Secret を相互に合わせる
+
+Pages の本番 URL が確定したら、Worker 側の `ALLOWED_ORIGIN` を更新する。
+
+```bash
+cd apps/api
+pnpm exec wrangler secret put ALLOWED_ORIGIN
+# 例: https://english-adlib-drill.pages.dev
+```
+
+---
+
+## 日常のデプロイフロー
+
+```mermaid
+flowchart LR
+  PR[PR を main にマージ] --> Push[main へ push]
+  Push --> CI[GitHub Actions: test / e2e]
+  Push --> WB[Workers Builds: API]
+  Push --> PG[Pages: Web]
+  WB --> API[english-adlib-api]
+  PG --> WEB[english-adlib-drill.pages.dev]
+```
+
+1. feature ブランチで開発 → PR 作成
+2. GitHub Actions でテストが通ることを確認
+3. `main` にマージ
+4. Cloudflare が自動的に API / Web をビルド・デプロイ
+5. Dashboard → 各プロジェクトの **Deployments** で成功を確認
+
+プレビュー環境（PR 用）が必要な場合は、Pages / Workers Builds の **Preview** 設定で `main` 以外のブランチビルドを有効にできる（Worker はデフォルトで `wrangler versions upload` となり、本番には昇格しない）。
+
+---
+
+## GitHub Actions（CI のみ）
+
+`main` への push および PR で `.github/workflows/ci.yml` が実行される。
+
+- **test**: unit テスト + Web ビルド確認
+- **e2e**: Playwright E2E
+
+**デプロイ用ジョブ（`deploy-api` / `deploy-web`）は使わない。** Cloudflare Git 連携に移行済みの場合は、ci.yml から削除してよい。
+
+### CI 用 Secrets（デプロイ不要）
+
+Cloudflare 自動デプロイでは GitHub Secrets に `CLOUDFLARE_API_TOKEN` 等は不要。CI のみなら追加 Secrets も不要。
+
+---
+
+## 手動デプロイ（緊急時・検証用）
+
+Cloudflare 連携とは別に、ローカルから Wrangler でデプロイできる。
+
+```bash
+# API
+cd apps/api
+pnpm run deploy
+
+# Web（ビルド後に wrangler pages deploy 等。通常は Pages Git 連携を使う）
+pnpm --filter @english-adlib/web build
+```
+
+---
 
 ## ローカル開発
 
@@ -50,19 +186,7 @@ pnpm dev:web
 
 採点1回あたりおおよそ 15〜25 Neurons（モデル・回答長による）。無料枠 10,000 Neurons/日。詳細は [ADR-0004](./adr/0004-llm-and-scoring.md)。
 
-## CI / デプロイ（GitHub Actions）
-
-`main` への push で `.github/workflows/ci.yml` が実行されます。
-
-### 必要な Secrets
-
-| Secret | 用途 |
-|--------|------|
-| `CLOUDFLARE_API_TOKEN` | Workers / Pages デプロイ |
-| `CLOUDFLARE_ACCOUNT_ID` | アカウント ID |
-| `VITE_API_BASE_URL` | 本番 Web から参照する Worker URL |
-
-### ローカル E2E
+## ローカル E2E
 
 ```bash
 pnpm test:e2e
