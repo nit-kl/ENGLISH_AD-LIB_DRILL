@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   createPlayStateReset,
-  formatUserAnswerForDisplay,
-  getConversationTurnsForStage,
   getQuestionsForStage,
   initialSetupComplete,
-  isOnFinalTurn,
   markQuestionComplete,
 } from "../src/application/game-flow.js";
 
@@ -48,7 +45,6 @@ describe("game-flow", () => {
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(false);
       expect(reset.timeLeft).toBe(60);
-      expect(reset.conversationExchanges).toEqual([]);
     });
 
     it("中級の動画お題も setup 未完了でリセット", () => {
@@ -63,51 +59,6 @@ describe("game-flow", () => {
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(true);
       expect(reset.answerTimerActive).toBe(true);
-    });
-  });
-
-  describe("conversation turns", () => {
-    it("ステージごとの必要ターン数", () => {
-      expect(getConversationTurnsForStage("beginner")).toBe(1);
-      expect(getConversationTurnsForStage("intermediate")).toBe(2);
-      expect(getConversationTurnsForStage("advanced")).toBe(3);
-      expect(getConversationTurnsForStage("legendary")).toBe(4);
-    });
-
-    it("中級は1回目は中間ターン", () => {
-      expect(isOnFinalTurn([], "intermediate")).toBe(false);
-    });
-
-    it("中級は2回目が最終ターン", () => {
-      expect(
-        isOnFinalTurn(
-          [
-            {
-              userText: "Hi",
-              counterpartLineEn: "Hello",
-              sceneUpdateJa: "挨拶が交わされました。",
-            },
-          ],
-          "intermediate",
-        ),
-      ).toBe(true);
-    });
-
-    it("採点画面用に全会話を整形する", () => {
-      const text = formatUserAnswerForDisplay(
-        [
-          {
-            userText: "In my previous role, I led a launch.",
-            counterpartLineEn: "What was the outcome?",
-            sceneUpdateJa: "面接官が深掘りを始めた。",
-          },
-        ],
-        "Sales exceeded our target.",
-        "面接官",
-      );
-      expect(text).toContain("あなた: In my previous role");
-      expect(text).toContain("面接官: What was the outcome");
-      expect(text).toContain("あなた: Sales exceeded");
     });
   });
 });

@@ -24,13 +24,6 @@ describe("stages data", () => {
     }
   });
 
-  it("ステージごとに会話ターン数が増える", () => {
-    expect(STAGES.beginner.conversationTurns).toBe(1);
-    expect(STAGES.intermediate.conversationTurns).toBe(2);
-    expect(STAGES.advanced.conversationTurns).toBe(3);
-    expect(STAGES.legendary.conversationTurns).toBe(4);
-  });
-
   it("intermediate-1 に YouTube 動画が紐づいている", () => {
     const q = STAGES.intermediate.questions.find((item) => item.id === "intermediate-1");
     expect(q).toBeDefined();

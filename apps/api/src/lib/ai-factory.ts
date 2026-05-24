@@ -1,17 +1,10 @@
-import type {
-  CounterpartReplyService,
-  ScoringService,
-  TranscriptionService,
-} from "@english-adlib/domain";
-import { FallbackCounterpartReplyService } from "../adapters/fallback-counterpart-reply-service.js";
+import type { ScoringService, TranscriptionService } from "@english-adlib/domain";
 import { FallbackScoringService } from "../adapters/fallback-scoring-service.js";
 import { FallbackTranscriptionService } from "../adapters/fallback-transcription-service.js";
 import { GeminiClient } from "../adapters/gemini/gemini-client.js";
-import { GeminiCounterpartReplyService } from "../adapters/gemini/gemini-counterpart-reply-service.js";
 import { GeminiScoringService } from "../adapters/gemini/gemini-scoring-service.js";
 import { GeminiTranscriptionService } from "../adapters/gemini/gemini-transcription-service.js";
 import { WhisperTranscriptionService } from "../adapters/whisper-transcription-service.js";
-import { WorkersAiCounterpartReplyService } from "../adapters/workers-ai-counterpart-reply-service.js";
 import {
   WorkersAiScoringService,
   type AiBinding,
@@ -56,19 +49,6 @@ export function createScoringService(env: ApiBindings): ScoringService {
   const gemini = new GeminiScoringService(createGeminiClient(env));
   return new FallbackScoringService(workers, gemini, () =>
     logGeminiFallback("scoring"),
-  );
-}
-
-export function createCounterpartReplyService(
-  env: ApiBindings,
-): CounterpartReplyService {
-  const workers = new WorkersAiCounterpartReplyService(env.AI, env.SCORING_MODEL);
-  if (!isGeminiFallbackEnabled(env)) {
-    return workers;
-  }
-  const gemini = new GeminiCounterpartReplyService(createGeminiClient(env));
-  return new FallbackCounterpartReplyService(workers, gemini, () =>
-    logGeminiFallback("counterpart"),
   );
 }
 

@@ -7,7 +7,5 @@ export type Stage = {
   label: string;
   sublabel: string;
   desc: string;
-  /** 採点までに必要な学習者の発話回数 */
-  conversationTurns: number;
   questions: Question[];
 };

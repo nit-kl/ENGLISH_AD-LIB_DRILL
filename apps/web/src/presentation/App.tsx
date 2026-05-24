@@ -47,14 +47,9 @@ export function App() {
         onSetupComplete={game.handleSetupComplete}
         userInput={game.userInput}
         onInputChange={game.setUserInput}
-        conversationExchanges={game.conversationExchanges}
-        totalConversationTurns={game.totalConversationTurns}
-        currentTurnIndex={game.currentTurnIndex}
-        onFinalTurn={game.onFinalTurn}
         showScoring={game.showScoring}
         feedback={game.feedback}
         animatedScore={game.animatedScore}
-        displayedUserAnswer={game.displayedUserAnswer}
         isSubmitting={game.isSubmitting}
         submitError={game.submitError}
         voice={game.voice}

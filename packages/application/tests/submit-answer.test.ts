@@ -55,7 +55,7 @@ describe("SubmitAnswerUseCase", () => {
       }),
     );
     await expect(
-      useCase.execute({ question: sampleQuestion, userTurns: ["   "] }),
+      useCase.execute({ question: sampleQuestion, answerText: "   " }),
     ).rejects.toThrow(/empty/i);
   });
 
@@ -75,7 +75,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      userTurns: ["I'd like a tall iced latte please"],
+      answerText: "I'd like a tall iced latte please",
     });
     expect(result.total).toBe(82);
     expect(result.goodPoints[0]).toBe("良いテンポ");
@@ -99,7 +99,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: beginner2,
-      userTurns: ["Nice to meet you. I'm Leo, I'm from Japan."],
+      answerText: "Nice to meet you. I'm Leo, I'm from Japan.",
     });
     expect(result.sceneUpdateJa).toBe(setupRepeat);
   });
@@ -120,47 +120,9 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      userTurns: ["I'd like to tall latte"],
+      answerText: "I'd like to tall latte",
     });
     expect(result.sceneUpdateJa).toBe("短い");
-  });
-
-  it("JSON 会話ログの sceneUpdateJa は中間ターンの場面描写にフォールバック", async () => {
-    const conversationFallback =
-      "面接官は製品ローンチの説明をうなずき、成果について深掘りする質問をしました。";
-    const useCase = new SubmitAnswerUseCase(
-      new FakeScoringService({
-        total: 75,
-        fluency: 75,
-        grammar: 75,
-        vocabulary: 75,
-        relevance: 75,
-        sceneUpdateJa:
-          '{"Learner said": "hello", "フロント係 said": "予約記録がないと言われました"}',
-        goodPoints: ["良い"],
-        improvements: ["改善"],
-        modelAnswer: "I have a reservation.",
-      }),
-    );
-    const result = await useCase.execute({
-      question: {
-        ...sampleQuestion,
-        id: "intermediate-1",
-        stageKey: "intermediate",
-        title: "ホテルでトラブル",
-        counterpart: "フロント係",
-      },
-      userTurns: ["hello", "This is unacceptable"],
-      priorExchanges: [
-        {
-          userText: "hello",
-          counterpartLineEn: "Could you tell me your reservation name?",
-          sceneUpdateJa: conversationFallback,
-        },
-      ],
-    });
-    expect(result.sceneUpdateJa).not.toContain("Learner said");
-    expect(result.sceneUpdateJa).toBe(conversationFallback);
   });
 
   it("LLM が total 0 でも英語回答なら点数を付ける", async () => {
@@ -179,7 +141,7 @@ describe("SubmitAnswerUseCase", () => {
     );
     const result = await useCase.execute({
       question: sampleQuestion,
-      userTurns: ["I'd like to tall latte"],
+      answerText: "I'd like to tall latte",
     });
     expect(result.total).toBeGreaterThanOrEqual(30);
   });
