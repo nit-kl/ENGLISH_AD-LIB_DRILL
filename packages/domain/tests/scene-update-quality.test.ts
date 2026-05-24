@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Question } from "../src/entities/question.js";
-import {
-  buildSceneUpdateFallback,
-  resolveSceneUpdateJa,
-} from "../src/lib/scene-update-fallback.js";
+import { resolveSceneUpdateJa } from "../src/lib/scene-update-fallback.js";
 import {
   looksLikeMalformedSceneUpdate,
   looksLikeSetupRepeat,
@@ -22,19 +19,6 @@ const beginner2: Question = {
   hints: ["Nice to meet you"],
   modelAnswer:
     "Nice to meet you, Sarah. I'm Yuki. I'm from Japan. I'm here to study English.",
-};
-
-const intermediate1: Question = {
-  id: "intermediate-1",
-  stageKey: "intermediate",
-  title: "ホテルでトラブル",
-  titleEn: "Hotel Trouble",
-  situation: "予約記録がないと言われました。",
-  role: "宿泊客",
-  counterpart: "フロント係",
-  icon: "🏨",
-  hints: ["I have a reservation"],
-  modelAnswer: "I have a reservation under Tanaka.",
 };
 
 describe("looksLikeSetupRepeat", () => {
@@ -63,43 +47,42 @@ describe("looksLikeMalformedSceneUpdate", () => {
       "フロント係が予約名を確認し、システムを再度検索する場面に進みました。";
     expect(looksLikeMalformedSceneUpdate(good)).toBe(false);
   });
+
+  it("日本語に英単語が混ざっても false", () => {
+    const good =
+      "面接官は product launch の説明をうなずき受け止め、sales target について深掘りする質問に移りました。";
+    expect(looksLikeMalformedSceneUpdate(good)).toBe(false);
+  });
 });
 
 describe("resolveSceneUpdateJa", () => {
-  it("お題再掲の LLM 出力を回答反映のフォールバックに差し替える", () => {
+  it("お題再掲の LLM 出力はそのまま返す", () => {
     const bad =
       '隣に座った人が "Hi!" と話しかけてきました。自己紹介してください。';
-    const result = resolveSceneUpdateJa(
-      bad,
-      beginner2,
-      "Nice to meet you Sara. I'm Leo, I'm from Japan.",
-    );
-    expect(looksLikeSetupRepeat(result, beginner2)).toBe(false);
-    expect(result).toContain("Leo");
-    expect(result).toContain("日本");
+    const result = resolveSceneUpdateJa(bad);
+    expect(result).toBe(bad);
   });
 
-  it("JSON 会話ログはフォールバックに差し替える", () => {
+  it("JSON 会話ログだけ差し替える", () => {
     const bad =
-      '{"Learner said": "hello", "フロント係 said": "予約記録がないと言われました", "Learner said": "This is unacceptable"}';
-    const result = resolveSceneUpdateJa(
-      bad,
-      intermediate1,
-      "Turn 1 (Learner): hello\nTurn 2 (Learner): This is unacceptable",
-    );
+      '{"Learner said": "hello", "フロント係 said": "予約記録がないと言われました"}';
+    const result = resolveSceneUpdateJa(bad);
     expect(result).not.toContain("Learner said");
-    expect(result).toContain("フロント");
+    expect(result).toBe("場面の描写を取得できませんでした。");
   });
-});
 
-describe("buildSceneUpdateFallback", () => {
-  it("beginner-2 は名前と出身を拾う", () => {
-    const text = buildSceneUpdateFallback(
-      beginner2,
-      "Nice to meet you. I'm Leo, I'm from Japan.",
-    );
-    expect(text).toContain("Leo");
-    expect(text).toContain("日本");
-    expect(text).not.toContain("自己紹介してください");
+  it("自然な日本語はそのまま返す", () => {
+    const good =
+      "面接官は回答をうなずき受け止め、チーム規模について深掘りする質問に移りました。";
+    expect(resolveSceneUpdateJa(good)).toBe(good);
+  });
+
+  it("空や JSON ログのときだけ conversationFallback を使う", () => {
+    const fallback =
+      "面接官は回答をうなずき、具体的な成果について深掘りする質問に移りました。";
+    expect(resolveSceneUpdateJa("", fallback)).toBe(fallback);
+    expect(
+      resolveSceneUpdateJa('{"Learner said": "hello"}', fallback),
+    ).toBe(fallback);
   });
 });

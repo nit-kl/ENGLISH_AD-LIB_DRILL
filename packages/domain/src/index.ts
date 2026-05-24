@@ -10,14 +10,11 @@ export {
 } from "./entities/question-media.js";
 export { type Stage, type StageKey } from "./entities/stage.js";
 export { parseScoreFeedback, type ScoreFeedback } from "./entities/score-feedback.js";
-export {
-  buildSceneUpdateFallback,
-  getSceneUpdateFallback,
-  resolveSceneUpdateJa,
-} from "./lib/scene-update-fallback.js";
-export { looksLikeMalformedSceneUpdate, looksLikeSetupRepeat, isLowQualitySceneUpdateJa } from "./lib/scene-update-quality.js";
+export { resolveSceneUpdateJa } from "./lib/scene-update-fallback.js";
+export { looksLikeMalformedSceneUpdate, looksLikeSetupRepeat } from "./lib/scene-update-quality.js";
 export {
   formatConversationTranscript,
+  formatFullConversationForScoring,
   isFinalConversationTurn,
 } from "./lib/conversation-transcript.js";
 export { applyScoreFloor } from "./lib/score-adjustment.js";

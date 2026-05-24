@@ -88,7 +88,7 @@ export function useGameFlow() {
           ...conversationExchanges.map((e) => e.userText),
           trimmed,
         ];
-        const result = await scoreAnswer(q.id, userTurns);
+        const result = await scoreAnswer(q.id, userTurns, conversationExchanges);
         setScore(result.total);
         setFeedback(result);
         setShowScoring(true);
@@ -203,7 +203,11 @@ export function useGameFlow() {
   const questions = getQuestionsForStage(currentStage);
   const currentQuestion = questions[questionIndex];
   const displayedUserAnswer = showScoring
-    ? formatUserAnswerForDisplay(conversationExchanges, userInput)
+    ? formatUserAnswerForDisplay(
+        conversationExchanges,
+        userInput,
+        currentQuestion?.counterpart ?? "",
+      )
     : userInput;
 
   return {

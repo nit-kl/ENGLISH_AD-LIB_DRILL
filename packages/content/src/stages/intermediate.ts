@@ -46,6 +46,16 @@ export const intermediateQuestions: Question[] = [
     hints: ["In my previous role", "I was responsible for", "As a result"],
     modelAnswer:
       "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent.",
+    media: {
+      setup: {
+        youtubeVideoId: "DISMBVDzWgM",
+        endSeconds: 33,
+      },
+      reveal: {
+        youtubeVideoId: "DISMBVDzWgM",
+        startSeconds: 33,
+      },
+    },
   },
   {
     id: "intermediate-3",

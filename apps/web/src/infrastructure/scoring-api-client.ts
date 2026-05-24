@@ -10,6 +10,7 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
 export async function scoreAnswer(
   questionId: string,
   userTurns: string | string[],
+  priorExchanges?: readonly ConversationExchange[],
 ): Promise<ScoreFeedback> {
   const turns = (Array.isArray(userTurns) ? userTurns : [userTurns]).map((t) =>
     t.trim(),
@@ -18,7 +19,13 @@ export async function scoreAnswer(
   const res = await fetch(`${baseUrl}/api/score`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ questionId, userTurns: turns }),
+    body: JSON.stringify({
+      questionId,
+      userTurns: turns,
+      ...(priorExchanges && priorExchanges.length > 0
+        ? { priorExchanges }
+        : {}),
+    }),
   });
   if (!res.ok) throw await parseApiError(res);
   const data = (await res.json()) as { feedback?: unknown };
