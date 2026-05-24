@@ -150,6 +150,11 @@ app.post("/api/score", async (c) => {
     questionId: string;
     answerText?: string;
     userTurns?: string[];
+    priorExchanges?: Array<{
+      userText: string;
+      counterpartLineEn: string;
+      sceneUpdateJa: string;
+    }>;
   }>();
 
   const question = stageRepository.getQuestionById(body.questionId);
@@ -176,6 +181,7 @@ app.post("/api/score", async (c) => {
     const feedback = await useCase.execute({
       question,
       userTurns,
+      priorExchanges: body.priorExchanges,
     });
     return c.json({ feedback });
   } catch (error) {

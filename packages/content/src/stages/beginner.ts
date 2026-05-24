@@ -48,7 +48,7 @@ export const beginnerQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "IurgHMDUExE",
-        endSeconds: 26,
+        endSeconds: 25,
       },
       reveal: {
         youtubeVideoId: "IurgHMDUExE",

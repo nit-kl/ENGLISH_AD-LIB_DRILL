@@ -1,5 +1,5 @@
 import {
-  formatConversationTranscript,
+  formatFullConversationForScoring,
   hasQuestionMedia,
   isFinalConversationTurn,
   type ConversationExchange,
@@ -45,9 +45,15 @@ export function isOnFinalTurn(
 export function formatUserAnswerForDisplay(
   exchanges: readonly ConversationExchange[],
   currentInput: string,
+  counterpart: string,
 ): string {
   const turns = [...exchanges.map((e) => e.userText), currentInput.trim()].filter(Boolean);
-  return formatConversationTranscript(turns);
+  if (exchanges.length === 0) {
+    return turns[0] ?? "";
+  }
+  return formatFullConversationForScoring(exchanges, currentInput, counterpart)
+    .replace(/^Learner:/gm, "あなた:")
+    .replace(new RegExp(`^${counterpart}:`, "gm"), `${counterpart}:`);
 }
 
 export function markQuestionComplete(

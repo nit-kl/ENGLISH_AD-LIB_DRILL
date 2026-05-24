@@ -81,7 +81,9 @@ describe("SubmitAnswerUseCase", () => {
     expect(result.goodPoints[0]).toBe("良いテンポ");
   });
 
-  it("お題の再掲は差し替えて返す", async () => {
+  it("お題の再掲は LLM 出力をそのまま返す", async () => {
+    const setupRepeat =
+      '隣に座った人が "Hi!" と話しかけてきました。自己紹介してください。';
     const useCase = new SubmitAnswerUseCase(
       new FakeScoringService({
         total: 90,
@@ -89,8 +91,7 @@ describe("SubmitAnswerUseCase", () => {
         grammar: 90,
         vocabulary: 90,
         relevance: 90,
-        sceneUpdateJa:
-          '隣に座った人が "Hi!" と話しかけてきました。自己紹介してください。',
+        sceneUpdateJa: setupRepeat,
         goodPoints: ["良い"],
         improvements: ["改善"],
         modelAnswer: beginner2.modelAnswer,
@@ -100,11 +101,10 @@ describe("SubmitAnswerUseCase", () => {
       question: beginner2,
       userTurns: ["Nice to meet you. I'm Leo, I'm from Japan."],
     });
-    expect(result.sceneUpdateJa).not.toContain("自己紹介してください");
-    expect(result.sceneUpdateJa).toMatch(/Leo|レオ|日本|サラ|Sarah/i);
+    expect(result.sceneUpdateJa).toBe(setupRepeat);
   });
 
-  it("sceneUpdateJa が短いときフォールバックする", async () => {
+  it("sceneUpdateJa が短くてもそのまま返す", async () => {
     const useCase = new SubmitAnswerUseCase(
       new FakeScoringService({
         total: 70,
@@ -122,11 +122,12 @@ describe("SubmitAnswerUseCase", () => {
       question: sampleQuestion,
       userTurns: ["I'd like to tall latte"],
     });
-    expect(result.sceneUpdateJa).toContain("店員");
-    expect(result.sceneUpdateJa.length).toBeGreaterThan(12);
+    expect(result.sceneUpdateJa).toBe("短い");
   });
 
-  it("JSON 会話ログの sceneUpdateJa はフォールバックする", async () => {
+  it("JSON 会話ログの sceneUpdateJa は中間ターンの場面描写にフォールバック", async () => {
+    const conversationFallback =
+      "面接官は製品ローンチの説明をうなずき、成果について深掘りする質問をしました。";
     const useCase = new SubmitAnswerUseCase(
       new FakeScoringService({
         total: 75,
@@ -150,9 +151,16 @@ describe("SubmitAnswerUseCase", () => {
         counterpart: "フロント係",
       },
       userTurns: ["hello", "This is unacceptable"],
+      priorExchanges: [
+        {
+          userText: "hello",
+          counterpartLineEn: "Could you tell me your reservation name?",
+          sceneUpdateJa: conversationFallback,
+        },
+      ],
     });
     expect(result.sceneUpdateJa).not.toContain("Learner said");
-    expect(result.sceneUpdateJa).toContain("フロント");
+    expect(result.sceneUpdateJa).toBe(conversationFallback);
   });
 
   it("LLM が total 0 でも英語回答なら点数を付ける", async () => {

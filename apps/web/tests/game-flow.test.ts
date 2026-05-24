@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createPlayStateReset,
+  formatUserAnswerForDisplay,
   getConversationTurnsForStage,
   getQuestionsForStage,
   initialSetupComplete,
@@ -58,7 +59,7 @@ describe("game-flow", () => {
     });
 
     it("動画なしの中級お題は即回答可能", () => {
-      const q = getQuestionsForStage("intermediate")[1];
+      const q = getQuestionsForStage("intermediate")[2];
       const reset = createPlayStateReset(q);
       expect(reset.setupComplete).toBe(true);
       expect(reset.answerTimerActive).toBe(true);
@@ -90,6 +91,23 @@ describe("game-flow", () => {
           "intermediate",
         ),
       ).toBe(true);
+    });
+
+    it("採点画面用に全会話を整形する", () => {
+      const text = formatUserAnswerForDisplay(
+        [
+          {
+            userText: "In my previous role, I led a launch.",
+            counterpartLineEn: "What was the outcome?",
+            sceneUpdateJa: "面接官が深掘りを始めた。",
+          },
+        ],
+        "Sales exceeded our target.",
+        "面接官",
+      );
+      expect(text).toContain("あなた: In my previous role");
+      expect(text).toContain("面接官: What was the outcome");
+      expect(text).toContain("あなた: Sales exceeded");
     });
   });
 });

@@ -43,11 +43,7 @@ function normalizeExchange(
   reply: CounterpartReply,
   question: Question,
 ): ConversationExchange {
-  const sceneUpdateJa = resolveSceneUpdateJa(
-    reply.sceneUpdateJa,
-    question,
-    userText,
-  );
+  const sceneUpdateJa = resolveSceneUpdateJa(reply.sceneUpdateJa);
   return {
     userText,
     counterpartLineEn: reply.counterpartLineEn.trim(),

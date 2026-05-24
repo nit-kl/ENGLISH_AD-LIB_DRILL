@@ -62,8 +62,8 @@ export function looksLikeMalformedSceneUpdate(sceneUpdateJa: string): boolean {
   const saidKeyMatches = scene.match(/"\s*[^"]*\s+said\s*"\s*:/gi) ?? [];
   if (saidKeyMatches.length >= 1) return true;
 
-  const englishTokens = scene.match(/\b[A-Za-z]{4,}\b/g) ?? [];
-  if (englishTokens.length >= 4) return true;
+  // Learner: / Counterpart: 形式の会話ログ
+  if (/^Learner:\s/m.test(scene) && /:\s/m.test(scene.slice(8))) return true;
 
   return false;
 }
