@@ -11,12 +11,12 @@ export function resolveSceneUpdateJa(
   conversationFallback?: string,
 ): string {
   const trimmed = sceneUpdateJa.trim();
-  if (trimmed.length >= 8 && !looksLikeMalformedSceneUpdate(trimmed)) {
+  if (trimmed.length > 0 && !looksLikeMalformedSceneUpdate(trimmed)) {
     return trimmed;
   }
 
   const fallback = conversationFallback?.trim();
-  if (fallback && fallback.length >= 8 && !looksLikeMalformedSceneUpdate(fallback)) {
+  if (fallback && fallback.length > 0 && !looksLikeMalformedSceneUpdate(fallback)) {
     return fallback;
   }
 
