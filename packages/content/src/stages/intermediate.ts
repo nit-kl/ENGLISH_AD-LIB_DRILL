@@ -5,7 +5,6 @@ export const intermediateStageMeta = {
   label: "中級",
   sublabel: "Intermediate",
   desc: "日常会話レベル",
-  conversationTurns: 2,
 };
 
 export const intermediateQuestions: Question[] = [
@@ -15,7 +14,7 @@ export const intermediateQuestions: Question[] = [
     title: "ホテルでトラブル",
     titleEn: "Hotel Trouble",
     situation:
-      "ハワイのホテルでチェックインしようとしたら、予約記録がないと言われました。冷静に状況を説明し、対応を求めてください。",
+      'ハワイのホテルでチェックインしようとしたら、フロント係に "I\'m sorry, I don\'t see a reservation under that name." と言われました。冷静に状況を説明し、対応を求めてください。',
     role: "困っている宿泊客",
     counterpart: "フロント係",
     icon: "🏨",

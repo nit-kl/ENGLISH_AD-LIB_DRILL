@@ -5,7 +5,6 @@ export const legendaryStageMeta = {
   label: "超人級",
   sublabel: "Legendary",
   desc: "ネイティブ級の言葉力",
-  conversationTurns: 4,
 };
 
 export const legendaryQuestions: Question[] = [

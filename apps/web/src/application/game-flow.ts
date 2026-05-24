@@ -1,8 +1,5 @@
 import {
-  formatFullConversationForScoring,
   hasQuestionMedia,
-  isFinalConversationTurn,
-  type ConversationExchange,
   type Question,
   type StageKey,
 } from "@english-adlib/domain";
@@ -25,37 +22,6 @@ export function getQuestionsForStage(stageKey: StageKey | null): Question[] {
   return STAGES[stageKey].questions;
 }
 
-export function getConversationTurnsForStage(stageKey: StageKey | null): number {
-  if (!stageKey) return 1;
-  return STAGES[stageKey].conversationTurns;
-}
-
-export function getCurrentTurnIndex(exchanges: readonly ConversationExchange[]): number {
-  return exchanges.length;
-}
-
-export function isOnFinalTurn(
-  exchanges: readonly ConversationExchange[],
-  stageKey: StageKey | null,
-): boolean {
-  const totalTurns = getConversationTurnsForStage(stageKey);
-  return isFinalConversationTurn(getCurrentTurnIndex(exchanges), totalTurns);
-}
-
-export function formatUserAnswerForDisplay(
-  exchanges: readonly ConversationExchange[],
-  currentInput: string,
-  counterpart: string,
-): string {
-  const turns = [...exchanges.map((e) => e.userText), currentInput.trim()].filter(Boolean);
-  if (exchanges.length === 0) {
-    return turns[0] ?? "";
-  }
-  return formatFullConversationForScoring(exchanges, currentInput, counterpart)
-    .replace(/^Learner:/gm, "あなた:")
-    .replace(new RegExp(`^${counterpart}:`, "gm"), `${counterpart}:`);
-}
-
 export function markQuestionComplete(
   completedIds: ReadonlySet<string>,
   questionId: string,
@@ -72,7 +38,6 @@ export type PlayStateReset = {
   submitError: null;
   setupComplete: boolean;
   answerTimerActive: boolean;
-  conversationExchanges: ConversationExchange[];
 };
 
 /** お題切替・一覧戻り時のプレイ状態リセット値 */
@@ -87,18 +52,5 @@ export function createPlayStateReset(question?: Question): PlayStateReset {
     submitError: null,
     setupComplete: ready,
     answerTimerActive: ready,
-    conversationExchanges: [],
-  };
-}
-
-/** 中間ターン完了後: 入力クリア・タイマーリセット */
-export function createMidTurnReset(): Pick<
-  PlayStateReset,
-  "userInput" | "timeLeft" | "submitError"
-> {
-  return {
-    userInput: "",
-    timeLeft: 60,
-    submitError: null,
   };
 }

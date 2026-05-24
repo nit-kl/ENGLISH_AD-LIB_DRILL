@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  createCounterpartReplyService,
   createScoringService,
   createTranscriptionService,
   type ApiBindings,
@@ -37,8 +36,7 @@ describe("ai-factory", () => {
     expect(service).toBeInstanceOf(WorkersAiScoringService);
   });
 
-  it("createTranscriptionService / createCounterpartReplyService が生成できる", () => {
+  it("createTranscriptionService が生成できる", () => {
     expect(createTranscriptionService(baseEnv)).toBeDefined();
-    expect(createCounterpartReplyService(baseEnv)).toBeDefined();
   });
 });

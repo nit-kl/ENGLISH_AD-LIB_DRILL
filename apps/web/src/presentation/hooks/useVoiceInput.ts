@@ -1,6 +1,11 @@
+import { useCallback, useRef } from "react";
 import { useSpeechRecognition } from "./useSpeechRecognition";
 import { useWhisperRecording } from "./useWhisperRecording";
 import { getSpeechRecognitionCtor } from "./speech-recognition-support";
+import {
+  createTranscriptDeduper,
+  shouldPreferWhisperOnMobile,
+} from "./voice-input-platform";
 
 export type VoiceInputLanguage = "en" | "ja";
 
@@ -33,17 +38,30 @@ export function useVoiceInput(
   const preferWhisper = options.preferWhisper ?? language === "ja";
   const speechLang = language === "ja" ? "ja-JP" : "en-US";
 
+  const dedupeRef = useRef(createTranscriptDeduper());
+  const onFinalTranscript = useCallback(
+    (text: string) => {
+      const deduped = dedupeRef.current(text);
+      if (deduped) onTranscript(deduped);
+    },
+    [onTranscript],
+  );
+
   const speech = useSpeechRecognition({
     lang: speechLang,
-    onFinalTranscript: onTranscript,
+    onFinalTranscript,
   });
 
-  const whisper = useWhisperRecording(onTranscript, {
+  const whisper = useWhisperRecording(onFinalTranscript, {
     language: language === "en" ? "en" : undefined,
   });
 
   const useWhisper =
-    preferWhisper || getSpeechRecognitionCtor() === null || !isWhisperVoiceSupported();
+    preferWhisper ||
+    (typeof navigator !== "undefined" &&
+      shouldPreferWhisperOnMobile(navigator.userAgent)) ||
+    getSpeechRecognitionCtor() === null ||
+    !isWhisperVoiceSupported();
 
   if (useWhisper) {
     return {

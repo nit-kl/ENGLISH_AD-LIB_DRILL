@@ -5,7 +5,6 @@ export const beginnerStageMeta = {
   label: "初級",
   sublabel: "Beginner",
   desc: "海外旅行レベル",
-  conversationTurns: 1,
 };
 
 export const beginnerQuestions: Question[] = [

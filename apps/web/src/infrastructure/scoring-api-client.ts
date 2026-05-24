@@ -1,4 +1,3 @@
-import type { ConversationExchange } from "@english-adlib/domain";
 import { parseScoreFeedback, type ScoreFeedback } from "@english-adlib/domain";
 import { ApiClientError, parseApiError } from "./api-error.js";
 
@@ -9,22 +8,14 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
 /** POST /api/score — サーバー側で後処理済みの feedback を返す */
 export async function scoreAnswer(
   questionId: string,
-  userTurns: string | string[],
-  priorExchanges?: readonly ConversationExchange[],
+  answerText: string,
 ): Promise<ScoreFeedback> {
-  const turns = (Array.isArray(userTurns) ? userTurns : [userTurns]).map((t) =>
-    t.trim(),
-  ).filter(Boolean);
-
   const res = await fetch(`${baseUrl}/api/score`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       questionId,
-      userTurns: turns,
-      ...(priorExchanges && priorExchanges.length > 0
-        ? { priorExchanges }
-        : {}),
+      answerText: answerText.trim(),
     }),
   });
   if (!res.ok) throw await parseApiError(res);
@@ -64,25 +55,4 @@ export async function transcribeAudio(
     throw new ApiClientError("Empty transcription", "TRANSCRIPTION_FAILED", 502, true);
   }
   return data.text.trim();
-}
-
-/** POST /api/conversation/turn — 中間ターンの相手返答 */
-export async function submitConversationTurn(input: {
-  questionId: string;
-  userText: string;
-  priorExchanges: readonly ConversationExchange[];
-  turnIndex: number;
-  totalTurns: number;
-}): Promise<ConversationExchange> {
-  const res = await fetch(`${baseUrl}/api/conversation/turn`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  if (!res.ok) throw await parseApiError(res);
-  const data = (await res.json()) as { exchange?: ConversationExchange };
-  if (!data.exchange?.userText || !data.exchange.counterpartLineEn) {
-    throw new ApiClientError("Invalid conversation response", "SCORING_FAILED", 502, true);
-  }
-  return data.exchange;
 }

@@ -5,7 +5,6 @@ export const advancedStageMeta = {
   label: "上級",
   sublabel: "Advanced",
   desc: "ビジネス&議論レベル",
-  conversationTurns: 3,
 };
 
 export const advancedQuestions: Question[] = [
@@ -29,7 +28,7 @@ export const advancedQuestions: Question[] = [
     title: "上司に反論する",
     titleEn: "Pushing Back",
     situation:
-      "外国人上司が「日本市場での研修予算を全額カットする」と提案。失礼にならない範囲で反対意見を述べてください。",
+      '外国人上司が "I\'m proposing we cut the entire training budget for the Japanese market." と提案してきました。失礼にならない範囲で反対意見を述べてください。',
     role: "マネージャー",
     counterpart: "上司",
     icon: "⚖️",
