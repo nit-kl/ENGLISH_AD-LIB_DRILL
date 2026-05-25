@@ -69,5 +69,15 @@ export const intermediateQuestions: Question[] = [
     hints: ["It was pretty good", "I ended up ~ing", "How about you?"],
     modelAnswer:
       "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?",
+    media: {
+      setup: {
+        youtubeVideoId: "QcqDlY0GEmc",
+        endSeconds: 33,
+      },
+      reveal: {
+        youtubeVideoId: "QcqDlY0GEmc",
+        startSeconds: 33,
+      },
+    },
   },
 ];
