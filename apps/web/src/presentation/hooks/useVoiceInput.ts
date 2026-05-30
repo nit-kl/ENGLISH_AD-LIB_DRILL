@@ -1,7 +1,11 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSpeechRecognition } from "./useSpeechRecognition";
 import { useWhisperRecording } from "./useWhisperRecording";
 import { getSpeechRecognitionCtor } from "./speech-recognition-support";
+import {
+  containsJapaneseScript,
+  ENGLISH_TRANSCRIPT_REJECTED_MESSAGE,
+} from "./transcript-language-guard";
 import {
   createTranscriptDeduper,
   shouldPreferWhisperOnMobile,
@@ -38,13 +42,20 @@ export function useVoiceInput(
   const preferWhisper = options.preferWhisper ?? language === "ja";
   const speechLang = language === "ja" ? "ja-JP" : "en-US";
 
+  const [validationError, setValidationError] = useState<string | null>(null);
   const dedupeRef = useRef(createTranscriptDeduper());
   const onFinalTranscript = useCallback(
     (text: string) => {
       const deduped = dedupeRef.current(text);
-      if (deduped) onTranscript(deduped);
+      if (!deduped) return;
+      if (language === "en" && containsJapaneseScript(deduped)) {
+        setValidationError(ENGLISH_TRANSCRIPT_REJECTED_MESSAGE);
+        return;
+      }
+      setValidationError(null);
+      onTranscript(deduped);
     },
-    [onTranscript],
+    [onTranscript, language],
   );
 
   const speech = useSpeechRecognition({
@@ -63,14 +74,23 @@ export function useVoiceInput(
     getSpeechRecognitionCtor() === null ||
     !isWhisperVoiceSupported();
 
+  const clearValidationError = useCallback(() => setValidationError(null), []);
+  const wrapToggle = useCallback(
+    (toggle: () => void) => () => {
+      clearValidationError();
+      toggle();
+    },
+    [clearValidationError],
+  );
+
   if (useWhisper) {
     return {
       useWhisper: true as const,
       isSupported: isWhisperVoiceSupported(),
       isListening: whisper.isRecording,
       isBusy: whisper.isTranscribing,
-      error: whisper.error,
-      toggle: whisper.toggle,
+      error: validationError ?? whisper.error,
+      toggle: wrapToggle(whisper.toggle),
       stop: whisper.stop,
       micLabel: whisper.isTranscribing
         ? "認識中…"
@@ -85,8 +105,8 @@ export function useVoiceInput(
     isSupported: speech.isSupported,
     isListening: speech.isListening,
     isBusy: false,
-    error: speech.error,
-    toggle: speech.toggle,
+    error: validationError ?? speech.error,
+    toggle: wrapToggle(speech.toggle),
     stop: speech.stop,
     micLabel: speech.isListening ? "録音中…" : "マイクで話す",
   };

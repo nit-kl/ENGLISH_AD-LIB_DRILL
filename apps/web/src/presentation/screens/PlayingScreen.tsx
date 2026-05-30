@@ -165,9 +165,14 @@ export function PlayingScreen({
               <span className="text-purple-300 text-xs">{countWords(userInput)} 単語</span>
             </div>
             <textarea
+              lang="en"
+              inputMode="text"
+              autoComplete="off"
+              autoCorrect="on"
+              spellCheck
               value={userInput}
               onChange={(e) => onInputChange(e.target.value)}
-              placeholder="英語で入力するか、マイクで話してください。"
+              placeholder="英語で入力するか、画面下の「マイクで話す」を使ってください。"
               disabled={!canAnswer}
               className="w-full bg-black/40 text-white placeholder-purple-300/50 rounded-2xl p-4 min-h-32 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-300/50 border border-white/10 leading-relaxed disabled:cursor-not-allowed"
               style={sans}
