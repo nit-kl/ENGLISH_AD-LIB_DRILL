@@ -38,7 +38,7 @@ describe("stages data", () => {
     expect(q).toBeDefined();
     expect(hasQuestionMedia(q!)).toBe(true);
     expect(q!.media?.setup.youtubeVideoId).toBe("QcqDlY0GEmc");
-    expect(q!.media?.setup.endSeconds).toBe(38);
-    expect(q!.media?.reveal.startSeconds).toBe(38);
+    expect(q!.media?.setup.endSeconds).toBe(33);
+    expect(q!.media?.reveal.startSeconds).toBe(33);
   });
 });

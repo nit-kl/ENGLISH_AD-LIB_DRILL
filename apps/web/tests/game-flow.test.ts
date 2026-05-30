@@ -1,3 +1,4 @@
+import type { Question } from "@english-adlib/domain";
 import { describe, expect, it } from "vitest";
 import {
   createPlayStateReset,
@@ -5,6 +6,19 @@ import {
   initialSetupComplete,
   markQuestionComplete,
 } from "../src/application/game-flow.js";
+
+const questionWithoutMedia: Question = {
+  id: "test-no-media",
+  stageKey: "intermediate",
+  title: "動画なしテスト",
+  titleEn: "No Media Test",
+  situation: "Test situation.",
+  role: "学習者",
+  counterpart: "相手",
+  icon: "📝",
+  hints: [],
+  modelAnswer: "Test answer.",
+};
 
 /** 責務: 画面遷移に使う純関数ロジック */
 describe("game-flow", () => {
@@ -54,9 +68,8 @@ describe("game-flow", () => {
       expect(reset.answerTimerActive).toBe(false);
     });
 
-    it("動画なしの中級お題は即回答可能", () => {
-      const q = getQuestionsForStage("intermediate")[2];
-      const reset = createPlayStateReset(q);
+    it("動画なしのお題は即回答可能", () => {
+      const reset = createPlayStateReset(questionWithoutMedia);
       expect(reset.setupComplete).toBe(true);
       expect(reset.answerTimerActive).toBe(true);
     });
