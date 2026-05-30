@@ -21,6 +21,16 @@ export const advancedQuestions: Question[] = [
     hints: ["Imagine a world where ~", "Today I want to talk about", "But first, let me ask you"],
     modelAnswer:
       "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room.",
+    media: {
+      setup: {
+        youtubeVideoId: "qDyAvRzFG2o",
+        endSeconds: 49,
+      },
+      reveal: {
+        youtubeVideoId: "qDyAvRzFG2o",
+        startSeconds: 49,
+      },
+    },
   },
   {
     id: "advanced-2",
@@ -35,6 +45,16 @@ export const advancedQuestions: Question[] = [
     hints: ["I understand your point, however", "With all due respect", "May I suggest an alternative"],
     modelAnswer:
       "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?",
+    media: {
+      setup: {
+        youtubeVideoId: "iTdwCbAlQaw",
+        endSeconds: 41,
+      },
+      reveal: {
+        youtubeVideoId: "iTdwCbAlQaw",
+        startSeconds: 41,
+      },
+    },
   },
   {
     id: "advanced-3",

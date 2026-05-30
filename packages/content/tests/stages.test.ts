@@ -32,4 +32,13 @@ describe("stages data", () => {
     expect(q!.media?.setup.endSeconds).toBe(34);
     expect(q!.media?.reveal.startSeconds).toBe(34);
   });
+
+  it("intermediate-3 に YouTube 動画が紐づいている", () => {
+    const q = STAGES.intermediate.questions.find((item) => item.id === "intermediate-3");
+    expect(q).toBeDefined();
+    expect(hasQuestionMedia(q!)).toBe(true);
+    expect(q!.media?.setup.youtubeVideoId).toBe("QcqDlY0GEmc");
+    expect(q!.media?.setup.endSeconds).toBe(33);
+    expect(q!.media?.reveal.startSeconds).toBe(33);
+  });
 });
