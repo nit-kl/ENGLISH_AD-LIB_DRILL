@@ -45,6 +45,16 @@ export const advancedQuestions: Question[] = [
     hints: ["I understand your point, however", "With all due respect", "May I suggest an alternative"],
     modelAnswer:
       "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?",
+    media: {
+      setup: {
+        youtubeVideoId: "iTdwCbAlQaw",
+        endSeconds: 41,
+      },
+      reveal: {
+        youtubeVideoId: "iTdwCbAlQaw",
+        startSeconds: 41,
+      },
+    },
   },
   {
     id: "advanced-3",
