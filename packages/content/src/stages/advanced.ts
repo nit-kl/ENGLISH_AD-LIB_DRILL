@@ -69,5 +69,15 @@ export const advancedQuestions: Question[] = [
     hints: ["I sincerely apologize", "Let me make this right", "I completely understand your frustration"],
     modelAnswer:
       "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward.",
+    media: {
+      setup: {
+        youtubeVideoId: "TZ4wWiZnwtk",
+        endSeconds: 34,
+      },
+      reveal: {
+        youtubeVideoId: "TZ4wWiZnwtk",
+        startSeconds: 34,
+      },
+    },
   },
 ];
