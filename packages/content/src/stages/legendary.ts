@@ -21,6 +21,16 @@ export const legendaryQuestions: Question[] = [
     hints: ["It's like a town square where ~", "Imagine a messenger that ~", "Everyone can hear what you say"],
     modelAnswer:
       "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly.",
+    media: {
+      setup: {
+        youtubeVideoId: "U0vpMY-zTmo",
+        endSeconds: 54,
+      },
+      reveal: {
+        youtubeVideoId: "U0vpMY-zTmo",
+        startSeconds: 54,
+      },
+    },
   },
   {
     id: "legendary-2",
