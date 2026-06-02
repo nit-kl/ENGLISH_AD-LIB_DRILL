@@ -45,6 +45,16 @@ export const legendaryQuestions: Question[] = [
     hints: ["Distinguished delegates", "The time for action is now", "We owe it to future generations"],
     modelAnswer:
       "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today.",
+    media: {
+      setup: {
+        youtubeVideoId: "InwJE-7j3JY",
+        endSeconds: 56,
+      },
+      reveal: {
+        youtubeVideoId: "InwJE-7j3JY",
+        startSeconds: 56,
+      },
+    },
   },
   {
     id: "legendary-3",
