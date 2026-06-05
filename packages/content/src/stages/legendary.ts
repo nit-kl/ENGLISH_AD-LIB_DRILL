@@ -21,6 +21,16 @@ export const legendaryQuestions: Question[] = [
     hints: ["It's like a town square where ~", "Imagine a messenger that ~", "Everyone can hear what you say"],
     modelAnswer:
       "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly.",
+    media: {
+      setup: {
+        youtubeVideoId: "U0vpMY-zTmo",
+        endSeconds: 54,
+      },
+      reveal: {
+        youtubeVideoId: "U0vpMY-zTmo",
+        startSeconds: 54,
+      },
+    },
   },
   {
     id: "legendary-2",
@@ -35,6 +45,16 @@ export const legendaryQuestions: Question[] = [
     hints: ["Distinguished delegates", "The time for action is now", "We owe it to future generations"],
     modelAnswer:
       "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today.",
+    media: {
+      setup: {
+        youtubeVideoId: "InwJE-7j3JY",
+        endSeconds: 56,
+      },
+      reveal: {
+        youtubeVideoId: "InwJE-7j3JY",
+        startSeconds: 56,
+      },
+    },
   },
   {
     id: "legendary-3",
@@ -49,5 +69,15 @@ export const legendaryQuestions: Question[] = [
     hints: ["This isn't just any sand", "What makes this special is", "You'd be the first in your tribe to"],
     modelAnswer:
       "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure.",
+    media: {
+      setup: {
+        youtubeVideoId: "u40ccJLhs2k",
+        endSeconds: 57,
+      },
+      reveal: {
+        youtubeVideoId: "u40ccJLhs2k",
+        startSeconds: 57,
+      },
+    },
   },
 ];
