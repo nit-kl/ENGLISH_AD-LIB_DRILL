@@ -69,5 +69,15 @@ export const legendaryQuestions: Question[] = [
     hints: ["This isn't just any sand", "What makes this special is", "You'd be the first in your tribe to"],
     modelAnswer:
       "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure.",
+    media: {
+      setup: {
+        youtubeVideoId: "u40ccJLhs2k",
+        endSeconds: 57,
+      },
+      reveal: {
+        youtubeVideoId: "u40ccJLhs2k",
+        startSeconds: 57,
+      },
+    },
   },
 ];
