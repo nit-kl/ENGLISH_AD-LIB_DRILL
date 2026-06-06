@@ -48,11 +48,11 @@ export const intermediateQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "DISMBVDzWgM",
-        endSeconds: 33,
+        endSeconds: 33.4,
       },
       reveal: {
         youtubeVideoId: "DISMBVDzWgM",
-        startSeconds: 33,
+        startSeconds: 33.4,
       },
     },
   },
@@ -72,11 +72,11 @@ export const intermediateQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "QcqDlY0GEmc",
-        endSeconds: 33,
+        endSeconds: 33.2,
       },
       reveal: {
         youtubeVideoId: "QcqDlY0GEmc",
-        startSeconds: 33,
+        startSeconds: 33.2,
       },
     },
   },

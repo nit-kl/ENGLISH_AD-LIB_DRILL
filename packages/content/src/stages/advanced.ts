@@ -24,11 +24,11 @@ export const advancedQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "qDyAvRzFG2o",
-        endSeconds: 49,
+        endSeconds: 49.3,
       },
       reveal: {
         youtubeVideoId: "qDyAvRzFG2o",
-        startSeconds: 49,
+        startSeconds: 49.3,
       },
     },
   },
@@ -48,11 +48,11 @@ export const advancedQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "iTdwCbAlQaw",
-        endSeconds: 41,
+        endSeconds: 41.3,
       },
       reveal: {
         youtubeVideoId: "iTdwCbAlQaw",
-        startSeconds: 41,
+        startSeconds: 41.3,
       },
     },
   },
@@ -72,11 +72,11 @@ export const advancedQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "TZ4wWiZnwtk",
-        endSeconds: 34,
+        endSeconds: 33.8,
       },
       reveal: {
         youtubeVideoId: "TZ4wWiZnwtk",
-        startSeconds: 34,
+        startSeconds: 33.8,
       },
     },
   },
