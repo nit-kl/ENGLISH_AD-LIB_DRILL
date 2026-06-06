@@ -1,6 +1,7 @@
 import { ChevronRight, Crown, Sparkles } from "lucide-react";
 import { BackgroundGlows } from "../components/BackgroundGlows";
 import { SparkleField } from "../components/SparkleField";
+import { EXPLANATION_VIDEO_TTS_NOTICE } from "../copy/video-notice";
 
 const serif = { fontFamily: '"Noto Serif JP", serif' } as const;
 const sans = { fontFamily: '"Noto Sans JP", sans-serif' } as const;
@@ -44,8 +45,12 @@ export function TitleScreen({ onStart }: Props) {
             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </span>
         </button>
-        <p className="mt-8 text-xs text-purple-300/70" style={sans}>
+        <p className="mt-8 text-xs text-purple-300/70 leading-relaxed" style={sans}>
           マイク・キーボード両対応 / 1問60秒
+          <br />
+          推奨環境: PC の Chrome または Edge（音声のリアルタイム表示）
+          <br />
+          <span className="text-purple-300/60">{EXPLANATION_VIDEO_TTS_NOTICE}</span>
         </p>
       </div>
     </div>

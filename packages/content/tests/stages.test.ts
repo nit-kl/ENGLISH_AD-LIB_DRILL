@@ -3,6 +3,29 @@ import { hasQuestionMedia } from "@english-adlib/domain";
 import { STAGES } from "../src/stages-data.js";
 import { staticStageRepository } from "../src/static-stage-repository.js";
 
+const QUESTION_MEDIA_EXPECTATIONS = [
+  { id: "beginner-1", youtubeVideoId: "ii50mPdVdhk", splitSeconds: 15 },
+  { id: "beginner-2", youtubeVideoId: "IurgHMDUExE", splitSeconds: 25.5 },
+  { id: "beginner-3", youtubeVideoId: "BmESAC8gpf0", splitSeconds: 23.5 },
+  { id: "intermediate-1", youtubeVideoId: "vpl3bvpg2Ck", splitSeconds: 34.3 },
+  { id: "intermediate-2", youtubeVideoId: "DISMBVDzWgM", splitSeconds: 33.4 },
+  { id: "intermediate-3", youtubeVideoId: "QcqDlY0GEmc", splitSeconds: 33.2 },
+  { id: "advanced-1", youtubeVideoId: "qDyAvRzFG2o", splitSeconds: 49.3 },
+  { id: "advanced-2", youtubeVideoId: "iTdwCbAlQaw", splitSeconds: 41.3 },
+  { id: "advanced-3", youtubeVideoId: "TZ4wWiZnwtk", splitSeconds: 33.8 },
+  { id: "legendary-1", youtubeVideoId: "U0vpMY-zTmo", splitSeconds: 54.3 },
+  { id: "legendary-2", youtubeVideoId: "InwJE-7j3JY", splitSeconds: 55.8 },
+  { id: "legendary-3", youtubeVideoId: "u40ccJLhs2k", splitSeconds: 57 },
+] as const;
+
+function findQuestion(id: string) {
+  for (const stage of Object.values(STAGES)) {
+    const q = stage.questions.find((item) => item.id === id);
+    if (q) return q;
+  }
+  return undefined;
+}
+
 /** 責務: ステージ・問題データの整合性を保証する */
 describe("stages data", () => {
   it("各ステージに問題が定義されている", () => {
@@ -24,21 +47,24 @@ describe("stages data", () => {
     }
   });
 
-  it("intermediate-1 に YouTube 動画が紐づいている", () => {
-    const q = STAGES.intermediate.questions.find((item) => item.id === "intermediate-1");
-    expect(q).toBeDefined();
-    expect(hasQuestionMedia(q!)).toBe(true);
-    expect(q!.media?.setup.youtubeVideoId).toBe("vpl3bvpg2Ck");
-    expect(q!.media?.setup.endSeconds).toBe(34);
-    expect(q!.media?.reveal.startSeconds).toBe(34);
+  it("全お題に YouTube 動画が紐づいている", () => {
+    for (const stage of Object.values(STAGES)) {
+      for (const q of stage.questions) {
+        expect(hasQuestionMedia(q), q.id).toBe(true);
+      }
+    }
   });
 
-  it("intermediate-3 に YouTube 動画が紐づいている", () => {
-    const q = STAGES.intermediate.questions.find((item) => item.id === "intermediate-3");
-    expect(q).toBeDefined();
-    expect(hasQuestionMedia(q!)).toBe(true);
-    expect(q!.media?.setup.youtubeVideoId).toBe("QcqDlY0GEmc");
-    expect(q!.media?.setup.endSeconds).toBe(33);
-    expect(q!.media?.reveal.startSeconds).toBe(33);
-  });
+  it.each(QUESTION_MEDIA_EXPECTATIONS)(
+    "$id に YouTube 動画が正しく紐づいている",
+    ({ id, youtubeVideoId, splitSeconds }) => {
+      const q = findQuestion(id);
+      expect(q).toBeDefined();
+      expect(hasQuestionMedia(q!)).toBe(true);
+      expect(q!.media?.setup.youtubeVideoId).toBe(youtubeVideoId);
+      expect(q!.media?.reveal.youtubeVideoId).toBe(youtubeVideoId);
+      expect(q!.media?.setup.endSeconds).toBe(splitSeconds);
+      expect(q!.media?.reveal.startSeconds).toBe(splitSeconds);
+    },
+  );
 });

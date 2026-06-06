@@ -4,16 +4,19 @@ import {
   getSpeechRecognitionErrorMessage,
   shouldAutoRestartAfterError,
 } from "./speech-recognition-errors.js";
+import { parseSpeechRecognitionResults } from "./speech-recognition-results.js";
 
 export type UseSpeechRecognitionOptions = {
   lang?: string;
   onFinalTranscript?: (text: string) => void;
+  /** 話している最中の仮認識テキスト（確定前） */
+  onInterimTranscript?: (text: string) => void;
 };
 
 const RESTART_DELAY_MS = 250;
 
 export function useSpeechRecognition(options: UseSpeechRecognitionOptions = {}) {
-  const { lang = "en-US", onFinalTranscript } = options;
+  const { lang = "en-US", onFinalTranscript, onInterimTranscript } = options;
   const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +24,9 @@ export function useSpeechRecognition(options: UseSpeechRecognitionOptions = {}) 
   const wantsListeningRef = useRef(false);
   const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinalTranscriptRef = useRef(onFinalTranscript);
+  const onInterimTranscriptRef = useRef(onInterimTranscript);
   onFinalTranscriptRef.current = onFinalTranscript;
+  onInterimTranscriptRef.current = onInterimTranscript;
 
   useEffect(() => {
     setIsSupported(getSpeechRecognitionCtor() !== null);
@@ -72,6 +77,7 @@ export function useSpeechRecognition(options: UseSpeechRecognitionOptions = {}) 
     wantsListeningRef.current = false;
     clearRestartTimer();
     detachRecognition();
+    onInterimTranscriptRef.current?.("");
     setIsListening(false);
     setError(null);
   }, [clearRestartTimer, detachRecognition]);
@@ -94,16 +100,14 @@ export function useSpeechRecognition(options: UseSpeechRecognitionOptions = {}) 
     recognition.interimResults = true;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalText = "";
-      for (let i = event.resultIndex; i < event.results.length; i += 1) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalText += result[0]?.transcript ?? "";
-        }
+      const { finalText, interimText } = parseSpeechRecognitionResults(
+        event.results,
+        event.resultIndex,
+      );
+      if (finalText) {
+        onFinalTranscriptRef.current?.(finalText);
       }
-      if (finalText.trim()) {
-        onFinalTranscriptRef.current?.(finalText.trim());
-      }
+      onInterimTranscriptRef.current?.(interimText);
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {

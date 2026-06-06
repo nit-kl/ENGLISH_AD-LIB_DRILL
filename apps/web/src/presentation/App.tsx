@@ -46,7 +46,8 @@ export function App() {
         setupComplete={game.setupComplete}
         onSetupComplete={game.handleSetupComplete}
         userInput={game.userInput}
-        onInputChange={game.setUserInput}
+        interimTranscript={game.interimTranscript}
+        onInputChange={game.handleInputChange}
         showScoring={game.showScoring}
         feedback={game.feedback}
         animatedScore={game.animatedScore}

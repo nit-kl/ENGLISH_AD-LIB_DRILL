@@ -2,7 +2,7 @@ import type { Question, StageKey } from "@english-adlib/domain";
 
 export const legendaryStageMeta = {
   key: "legendary" as StageKey,
-  label: "超人級",
+  label: "レジェンド",
   sublabel: "Legendary",
   desc: "ネイティブ級の言葉力",
 };
@@ -24,11 +24,11 @@ export const legendaryQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "U0vpMY-zTmo",
-        endSeconds: 54,
+        endSeconds: 54.3,
       },
       reveal: {
         youtubeVideoId: "U0vpMY-zTmo",
-        startSeconds: 54,
+        startSeconds: 54.3,
       },
     },
   },
@@ -48,11 +48,11 @@ export const legendaryQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "InwJE-7j3JY",
-        endSeconds: 56,
+        endSeconds: 55.8,
       },
       reveal: {
         youtubeVideoId: "InwJE-7j3JY",
-        startSeconds: 56,
+        startSeconds: 55.8,
       },
     },
   },

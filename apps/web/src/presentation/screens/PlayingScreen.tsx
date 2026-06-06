@@ -27,6 +27,7 @@ type Props = {
   setupComplete: boolean;
   onSetupComplete: () => void;
   userInput: string;
+  interimTranscript?: string;
   onInputChange: (v: string) => void;
   showScoring: boolean;
   feedback: ScoreFeedback | null;
@@ -52,6 +53,7 @@ export function PlayingScreen({
   setupComplete,
   onSetupComplete,
   userInput,
+  interimTranscript = "",
   onInputChange,
   showScoring,
   feedback,
@@ -69,12 +71,17 @@ export function PlayingScreen({
   const canAnswer = !videoMode || setupComplete;
   const timerVisible = answerTimerActive && canAnswer && !showScoring;
   const submitLabel = isSubmitting ? "採点中…" : "採点する";
+  const displayInput = interimTranscript
+    ? userInput
+      ? `${userInput} ${interimTranscript}`
+      : interimTranscript
+    : userInput;
 
   const handleSetupComplete = useCallback(() => {
     onSetupComplete();
   }, [onSetupComplete]);
 
-  const scoringNextLabel = videoMode ? "模範解答と解説を見る" : finishLabel;
+  const scoringNextLabel = videoMode ? "解説動画を見る" : finishLabel;
   const scoringNext = videoMode ? onContinueToReveal : onNext;
 
   return (
@@ -162,7 +169,7 @@ export function PlayingScreen({
             )}
             <div className="flex justify-between mb-3">
               <span className="text-purple-200 text-sm font-bold">あなたの回答（英語で）</span>
-              <span className="text-purple-300 text-xs">{countWords(userInput)} 単語</span>
+              <span className="text-purple-300 text-xs">{countWords(displayInput)} 単語</span>
             </div>
             <textarea
               lang="en"
@@ -170,7 +177,7 @@ export function PlayingScreen({
               autoComplete="off"
               autoCorrect="on"
               spellCheck
-              value={userInput}
+              value={displayInput}
               onChange={(e) => onInputChange(e.target.value)}
               placeholder="英語で入力するか、画面下の「マイクで話す」を使ってください。"
               disabled={!canAnswer}
@@ -178,7 +185,12 @@ export function PlayingScreen({
               style={sans}
             />
             {voice.error && <p className="text-rose-300 text-sm mt-2">{voice.error}</p>}
-            {voice.isListening && (
+            {voice.isListening && voice.supportsRealtime && (
+              <p className="text-purple-300 text-xs mt-2">
+                話している最中から英語が表示されます。終了したらもう一度ボタンを押してください。
+              </p>
+            )}
+            {voice.isListening && !voice.supportsRealtime && (
               <p className="text-purple-300 text-xs mt-2">
                 録音中です。話し終わったらもう一度ボタンを押して認識します。
               </p>
