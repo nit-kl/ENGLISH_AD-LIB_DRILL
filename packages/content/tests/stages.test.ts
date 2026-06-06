@@ -29,8 +29,8 @@ describe("stages data", () => {
     expect(q).toBeDefined();
     expect(hasQuestionMedia(q!)).toBe(true);
     expect(q!.media?.setup.youtubeVideoId).toBe("vpl3bvpg2Ck");
-    expect(q!.media?.setup.endSeconds).toBe(34);
-    expect(q!.media?.reveal.startSeconds).toBe(34);
+    expect(q!.media?.setup.endSeconds).toBe(34.3);
+    expect(q!.media?.reveal.startSeconds).toBe(34.3);
   });
 
   it("intermediate-3 に YouTube 動画が紐づいている", () => {
