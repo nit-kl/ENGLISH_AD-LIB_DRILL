@@ -93,7 +93,7 @@ export function ScoreResultPanel({
 
         {deferModelAndTips && (
           <p className="text-center text-purple-200/80 text-sm mb-4 shrink-0">
-            次の画面で模範解答と解説動画を確認できます
+            次の画面で解説動画を確認できます
           </p>
         )}
 

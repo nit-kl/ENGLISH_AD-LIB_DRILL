@@ -19,6 +19,7 @@ export function useGameFlow() {
   const [currentStage, setCurrentStage] = useState<StageKey | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
+  const [interimTranscript, setInterimTranscript] = useState("");
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<ScoreFeedback | null>(null);
@@ -32,15 +33,25 @@ export function useGameFlow() {
   );
 
   const appendTranscript = useCallback((text: string) => {
+    setInterimTranscript("");
     setUserInput((prev) => (prev ? `${prev} ${text}` : text));
   }, []);
 
-  const voice = useVoiceInput(appendTranscript, { language: "en" });
+  const handleInputChange = useCallback((value: string) => {
+    setInterimTranscript("");
+    setUserInput(value);
+  }, []);
+
+  const voice = useVoiceInput(appendTranscript, {
+    language: "en",
+    onInterimTranscript: setInterimTranscript,
+  });
 
   const resetPlayState = useCallback(
     (question?: Question) => {
       const reset = createPlayStateReset(question);
       setUserInput(reset.userInput);
+      setInterimTranscript("");
       setTimeLeft(reset.timeLeft);
       setScore(reset.score);
       setFeedback(reset.feedback);
@@ -170,7 +181,8 @@ export function useGameFlow() {
     currentStage,
     questionIndex,
     userInput,
-    setUserInput,
+    interimTranscript,
+    handleInputChange,
     timeLeft,
     score,
     feedback,

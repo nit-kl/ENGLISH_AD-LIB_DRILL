@@ -24,11 +24,11 @@ export const intermediateQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "vpl3bvpg2Ck",
-        endSeconds: 34,
+        endSeconds: 34.3,
       },
       reveal: {
         youtubeVideoId: "vpl3bvpg2Ck",
-        startSeconds: 34,
+        startSeconds: 34.3,
       },
     },
   },

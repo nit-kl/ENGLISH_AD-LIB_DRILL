@@ -3,8 +3,8 @@ import { useSpeechRecognition } from "./useSpeechRecognition";
 import { useWhisperRecording } from "./useWhisperRecording";
 import { getSpeechRecognitionCtor } from "./speech-recognition-support";
 import {
-  containsJapaneseScript,
   ENGLISH_TRANSCRIPT_REJECTED_MESSAGE,
+  normalizeEnglishTranscript,
 } from "./transcript-language-guard";
 import {
   createTranscriptDeduper,
@@ -21,6 +21,8 @@ export type UseVoiceInputOptions = {
    * false: ADR-0006 どおり Web Speech 優先（英語・Chrome/Edge）
    */
   preferWhisper?: boolean;
+  /** Web Speech 利用時のみ。話している最中の仮認識テキスト */
+  onInterimTranscript?: (text: string) => void;
 };
 
 function isWhisperVoiceSupported(): boolean {
@@ -41,6 +43,7 @@ export function useVoiceInput(
   const language = options.language ?? "en";
   const preferWhisper = options.preferWhisper ?? language === "ja";
   const speechLang = language === "ja" ? "ja-JP" : "en-US";
+  const { onInterimTranscript } = options;
 
   const [validationError, setValidationError] = useState<string | null>(null);
   const dedupeRef = useRef(createTranscriptDeduper());
@@ -48,8 +51,14 @@ export function useVoiceInput(
     (text: string) => {
       const deduped = dedupeRef.current(text);
       if (!deduped) return;
-      if (language === "en" && containsJapaneseScript(deduped)) {
-        setValidationError(ENGLISH_TRANSCRIPT_REJECTED_MESSAGE);
+      if (language === "en") {
+        const normalized = normalizeEnglishTranscript(deduped);
+        if (!normalized) {
+          setValidationError(ENGLISH_TRANSCRIPT_REJECTED_MESSAGE);
+          return;
+        }
+        setValidationError(null);
+        onTranscript(normalized);
         return;
       }
       setValidationError(null);
@@ -61,6 +70,7 @@ export function useVoiceInput(
   const speech = useSpeechRecognition({
     lang: speechLang,
     onFinalTranscript,
+    onInterimTranscript,
   });
 
   const whisper = useWhisperRecording(onFinalTranscript, {
@@ -86,6 +96,7 @@ export function useVoiceInput(
   if (useWhisper) {
     return {
       useWhisper: true as const,
+      supportsRealtime: false as const,
       isSupported: isWhisperVoiceSupported(),
       isListening: whisper.isRecording,
       isBusy: whisper.isTranscribing,
@@ -102,6 +113,7 @@ export function useVoiceInput(
 
   return {
     useWhisper: false as const,
+    supportsRealtime: true as const,
     isSupported: speech.isSupported,
     isListening: speech.isListening,
     isBusy: false,

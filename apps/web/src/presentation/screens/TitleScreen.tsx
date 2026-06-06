@@ -44,8 +44,10 @@ export function TitleScreen({ onStart }: Props) {
             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </span>
         </button>
-        <p className="mt-8 text-xs text-purple-300/70" style={sans}>
+        <p className="mt-8 text-xs text-purple-300/70 leading-relaxed" style={sans}>
           マイク・キーボード両対応 / 1問60秒
+          <br />
+          推奨環境: PC の Chrome または Edge（音声のリアルタイム表示）
         </p>
       </div>
     </div>

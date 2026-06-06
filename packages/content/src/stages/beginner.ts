@@ -47,11 +47,11 @@ export const beginnerQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "IurgHMDUExE",
-        endSeconds: 25,
+        endSeconds: 25.5,
       },
       reveal: {
         youtubeVideoId: "IurgHMDUExE",
-        startSeconds: 26,
+        startSeconds: 25.5,
       },
     },
   },
@@ -71,11 +71,11 @@ export const beginnerQuestions: Question[] = [
     media: {
       setup: {
         youtubeVideoId: "BmESAC8gpf0",
-        endSeconds: 23,
+        endSeconds: 23.5,
       },
       reveal: {
         youtubeVideoId: "BmESAC8gpf0",
-        startSeconds: 23,
+        startSeconds: 23.5,
       },
     },
   },
