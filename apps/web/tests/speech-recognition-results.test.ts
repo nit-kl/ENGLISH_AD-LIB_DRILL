@@ -10,7 +10,7 @@ function mockResults(
         isFinal: item.isFinal,
         0: { transcript: item.transcript },
         length: 1,
-      }) as SpeechRecognitionResult,
+      }) as unknown as SpeechRecognitionResult,
   );
   return list as unknown as SpeechRecognitionResultList;
 }

@@ -1,5 +1,6 @@
 import { BookOpen, ChevronRight, Play, Sparkles, Trophy, User } from "lucide-react";
 import type { ScoreFeedback } from "@english-adlib/domain";
+import { EXPLANATION_VIDEO_TTS_NOTICE } from "../copy/video-notice";
 import { SparkleField } from "./SparkleField";
 
 type Props = {
@@ -92,9 +93,10 @@ export function ScoreResultPanel({
         </div>
 
         {deferModelAndTips && (
-          <p className="text-center text-purple-200/80 text-sm mb-4 shrink-0">
-            次の画面で解説動画を確認できます
-          </p>
+          <div className="text-center text-purple-200/80 text-sm mb-4 shrink-0 space-y-2">
+            <p>次の画面で解説動画を確認できます</p>
+            <p className="text-xs text-purple-200/60 leading-relaxed">{EXPLANATION_VIDEO_TTS_NOTICE}</p>
+          </div>
         )}
 
         <button

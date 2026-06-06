@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { ChevronRight, ExternalLink, Home, Sparkles } from "lucide-react";
 import { hasQuestionMedia, type Question, type ScoreFeedback } from "@english-adlib/domain";
 import { YouTubePlayer } from "../components/YouTubePlayer";
+import { EXPLANATION_VIDEO_TTS_NOTICE } from "../copy/video-notice";
 
 const sans = { fontFamily: '"Noto Sans JP", sans-serif' } as const;
 
@@ -69,6 +70,10 @@ export function RevealScreen({ question, feedback, finishLabel, onHome, onBackTo
           </div>
           <p className="text-white text-sm leading-relaxed">{feedback.sceneUpdateJa}</p>
         </div>
+
+        <p className="text-purple-200/70 text-xs leading-relaxed mb-3 px-1">
+          {EXPLANATION_VIDEO_TTS_NOTICE}
+        </p>
 
         <YouTubePlayer
           segment={reveal}
