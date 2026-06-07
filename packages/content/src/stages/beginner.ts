@@ -79,4 +79,28 @@ export const beginnerQuestions: Question[] = [
       },
     },
   },
+  {
+    id: "beginner-4",
+    stageKey: "beginner",
+    title: "空港の入国審査",
+    titleEn: "Airport Immigration",
+    situation:
+      'ロサンゼルスの空港で入国審査に並んでいます。入国審査官に "What\'s the purpose of your visit?" と聞かれました。観光目的と滞在期間を伝えてください。',
+    role: "旅行者",
+    counterpart: "入国審査官",
+    icon: "✈️",
+    hints: ["I'm here for tourism", "I'll stay for ~", "I'm visiting ~"],
+    modelAnswer:
+      "I'm here for tourism. I'll stay for two weeks. I'm visiting Los Angeles and San Francisco.",
+    media: {
+      setup: {
+        youtubeVideoId: "c4yakFGsaV8",
+        endSeconds: 30.3,
+      },
+      reveal: {
+        youtubeVideoId: "c4yakFGsaV8",
+        startSeconds: 30.3,
+      },
+    },
+  },
 ];

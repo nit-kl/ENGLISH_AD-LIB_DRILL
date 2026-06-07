@@ -33,6 +33,12 @@ GOOD sceneUpdateJa:
 レオさんが日本から来て留学中だと自己紹介したので、サラは笑顔でうなずき、学校や英語学習の話を続ける場面に進みました。
 BAD (never): 「サラが Hi と話しかけてきました。自己紹介してください。」— that is BEFORE the learner spoke.`;
   }
+  if (question.id === "beginner-4") {
+    return `EXAMPLE for "I'm here for tourism. I'll stay for two weeks.":
+GOOD sceneUpdateJa:
+観光目的で2週間滞在すると伝えた。入国審査官はうなずき受け止め、行き先や帰国便の確認に進む段階になりました。
+BAD (never): {"Learner said": "I'm here for tourism"} or restating「観光目的と滞在期間を伝えてください」.`;
+  }
   if (question.id === "intermediate-1") {
     return `EXAMPLE for "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.":
 GOOD sceneUpdateJa:
