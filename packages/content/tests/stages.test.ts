@@ -9,6 +9,8 @@ const QUESTION_MEDIA_EXPECTATIONS = [
   { id: "beginner-2", youtubeVideoId: "IurgHMDUExE", splitSeconds: 25.5 },
   { id: "beginner-3", youtubeVideoId: "BmESAC8gpf0", splitSeconds: 23.5 },
   { id: "beginner-4", youtubeVideoId: "c4yakFGsaV8", splitSeconds: 30.3 },
+  { id: "beginner-5", youtubeVideoId: "uVlqeeHH1q0", splitSeconds: 24.5 },
+  { id: "beginner-6", youtubeVideoId: "Fb5U_zYLusw", splitSeconds: 27 },
   { id: "intermediate-1", youtubeVideoId: "vpl3bvpg2Ck", splitSeconds: 34.3 },
   { id: "intermediate-2", youtubeVideoId: "DISMBVDzWgM", splitSeconds: 33.4 },
   { id: "intermediate-3", youtubeVideoId: "QcqDlY0GEmc", splitSeconds: 33.2 },

@@ -103,4 +103,50 @@ export const beginnerQuestions: Question[] = [
       },
     },
   },
+  {
+    id: "beginner-5",
+    stageKey: "beginner",
+    title: "タクシーに乗る",
+    titleEn: "Taking a Taxi",
+    situation:
+      'ニューヨークの街角でタクシーに乗りました。運転手に "Where to?" と聞かれました。タイムズスクエアまで行きたいと伝えてください。',
+    role: "乗客",
+    counterpart: "運転手",
+    icon: "🚕",
+    hints: ["Could you take me to ~", "I'd like to go to ~", "please"],
+    modelAnswer: "Could you take me to Times Square, please?",
+    media: {
+      setup: {
+        youtubeVideoId: "uVlqeeHH1q0",
+        endSeconds: 24.5,
+      },
+      reveal: {
+        youtubeVideoId: "uVlqeeHH1q0",
+        startSeconds: 24.5,
+      },
+    },
+  },
+  {
+    id: "beginner-6",
+    stageKey: "beginner",
+    title: "レストランで席を聞く",
+    titleEn: "Restaurant Seating",
+    situation:
+      'ロンドンのレストランに予約なしで入店しました。ホストに "Do you have a reservation?" と聞かれました。予約がないことと2人分の席を伝えてください。',
+    role: "お客さん",
+    counterpart: "ホスト",
+    icon: "🍽️",
+    hints: ["No, we don't", "Table for ~", "please"],
+    modelAnswer: "No, we don't. Table for two, please.",
+    media: {
+      setup: {
+        youtubeVideoId: "Fb5U_zYLusw",
+        endSeconds: 27,
+      },
+      reveal: {
+        youtubeVideoId: "Fb5U_zYLusw",
+        startSeconds: 27,
+      },
+    },
+  },
 ];

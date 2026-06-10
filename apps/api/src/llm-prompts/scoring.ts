@@ -39,6 +39,18 @@ GOOD sceneUpdateJa:
 観光目的で2週間滞在すると伝えた。入国審査官はうなずき受け止め、行き先や帰国便の確認に進む段階になりました。
 BAD (never): {"Learner said": "I'm here for tourism"} or restating「観光目的と滞在期間を伝えてください」.`;
   }
+  if (question.id === "beginner-5") {
+    return `EXAMPLE for "Could you take me to Times Square, please?":
+GOOD sceneUpdateJa:
+タイムズスクエアまでお願いすると伝えた。運転手はうなずいてメーターを起動し、車が渋滞を避けて南下し始めました。
+BAD (never): {"Learner said": "Could you take me to Times Square"} or restating「目的地を伝えてください」.`;
+  }
+  if (question.id === "beginner-6") {
+    return `EXAMPLE for "No, we don't. Table for two, please.":
+GOOD sceneUpdateJa:
+予約がないことと2人分の席を伝えた。ホストは笑顔でうなずき、空いているテーブルへ案内し始めました。
+BAD (never): {"Learner said": "Table for two"} or restating「予約なしと人数を伝えてください」.`;
+  }
   if (question.id === "intermediate-1") {
     return `EXAMPLE for "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.":
 GOOD sceneUpdateJa:
