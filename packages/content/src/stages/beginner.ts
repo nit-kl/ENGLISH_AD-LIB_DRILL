@@ -149,4 +149,27 @@ export const beginnerQuestions: Question[] = [
       },
     },
   },
+  {
+    id: "beginner-7",
+    stageKey: "beginner",
+    title: "お土産店で買い物",
+    titleEn: "Souvenir Shopping",
+    situation:
+      'ロンドンのお土産店でTシャツを手に取りました。店員に "Can I help you?" と声をかけられました。値段とサイズを聞いてください。',
+    role: "お客さん",
+    counterpart: "店員",
+    icon: "🎁",
+    hints: ["How much is this", "Do you have it in ~", "medium / large"],
+    modelAnswer: "Yes. How much is this T-shirt? Do you have it in medium?",
+    media: {
+      setup: {
+        youtubeVideoId: "ub8VU_RXzJs",
+        endSeconds: 27,
+      },
+      reveal: {
+        youtubeVideoId: "ub8VU_RXzJs",
+        startSeconds: 27,
+      },
+    },
+  },
 ];

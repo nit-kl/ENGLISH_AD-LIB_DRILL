@@ -19,6 +19,7 @@ export const QUESTION_TOPICS: QuestionTopic[] = [
   { id: "beginner-4", setting: "空港（入国審査）", goal: "滞在目的と期間を伝える" },
   { id: "beginner-5", setting: "タクシー", goal: "目的地を伝える" },
   { id: "beginner-6", setting: "レストラン", goal: "席と人数（予約の有無）を伝える" },
+  { id: "beginner-7", setting: "お土産店", goal: "値段やサイズを聞く" },
   { id: "intermediate-1", setting: "ホテル", goal: "チェックインの予約トラブルを解決する" },
   { id: "intermediate-2", setting: "面接会場", goal: "職場のチャレンジ経験を話す" },
   { id: "intermediate-3", setting: "職場（リモート会議前）", goal: "週末の出来事を雑談する" },
