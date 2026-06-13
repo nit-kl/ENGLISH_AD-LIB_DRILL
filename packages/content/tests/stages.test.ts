@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { hasQuestionMedia } from "@english-adlib/domain";
+import { findDuplicateQuestionTopics, QUESTION_TOPICS } from "../src/question-topics.js";
 import { STAGES } from "../src/stages-data.js";
 import { staticStageRepository } from "../src/static-stage-repository.js";
 
@@ -7,6 +8,11 @@ const QUESTION_MEDIA_EXPECTATIONS = [
   { id: "beginner-1", youtubeVideoId: "ii50mPdVdhk", splitSeconds: 15 },
   { id: "beginner-2", youtubeVideoId: "IurgHMDUExE", splitSeconds: 25.5 },
   { id: "beginner-3", youtubeVideoId: "BmESAC8gpf0", splitSeconds: 23.5 },
+  { id: "beginner-4", youtubeVideoId: "c4yakFGsaV8", splitSeconds: 30.3 },
+  { id: "beginner-5", youtubeVideoId: "uVlqeeHH1q0", splitSeconds: 24.5 },
+  { id: "beginner-6", youtubeVideoId: "Fb5U_zYLusw", splitSeconds: 27 },
+  { id: "beginner-7", youtubeVideoId: "ub8VU_RXzJs", splitSeconds: 27 },
+  { id: "beginner-8", youtubeVideoId: "LrmJDzZ00K4", splitSeconds: 29 },
   { id: "intermediate-1", youtubeVideoId: "vpl3bvpg2Ck", splitSeconds: 34.3 },
   { id: "intermediate-2", youtubeVideoId: "DISMBVDzWgM", splitSeconds: 33.4 },
   { id: "intermediate-3", youtubeVideoId: "QcqDlY0GEmc", splitSeconds: 33.2 },
@@ -67,4 +73,20 @@ describe("stages data", () => {
       expect(q!.media?.reveal.startSeconds).toBe(splitSeconds);
     },
   );
+
+  it("全お題が question-topics に登録されている", () => {
+    const questionIds = Object.values(STAGES).flatMap((stage) =>
+      stage.questions.map((q) => q.id),
+    );
+    const topicIds = QUESTION_TOPICS.map((t) => t.id);
+    expect(topicIds.sort()).toEqual([...questionIds].sort());
+  });
+
+  it("お題の場所＋会話の目的が重複しない", () => {
+    const duplicates = findDuplicateQuestionTopics(QUESTION_TOPICS);
+    const message = duplicates
+      .map((d) => `${d.setting}／${d.goal}: ${d.ids.join(", ")}`)
+      .join("; ");
+    expect(duplicates, message).toEqual([]);
+  });
 });

@@ -33,6 +33,36 @@ GOOD sceneUpdateJa:
 レオさんが日本から来て留学中だと自己紹介したので、サラは笑顔でうなずき、学校や英語学習の話を続ける場面に進みました。
 BAD (never): 「サラが Hi と話しかけてきました。自己紹介してください。」— that is BEFORE the learner spoke.`;
   }
+  if (question.id === "beginner-4") {
+    return `EXAMPLE for "I'm here for tourism. I'll stay for two weeks.":
+GOOD sceneUpdateJa:
+観光目的で2週間滞在すると伝えた。入国審査官はうなずき受け止め、行き先や帰国便の確認に進む段階になりました。
+BAD (never): {"Learner said": "I'm here for tourism"} or restating「観光目的と滞在期間を伝えてください」.`;
+  }
+  if (question.id === "beginner-5") {
+    return `EXAMPLE for "Could you take me to Times Square, please?":
+GOOD sceneUpdateJa:
+タイムズスクエアまでお願いすると伝えた。運転手はうなずいてメーターを起動し、車が渋滞を避けて南下し始めました。
+BAD (never): {"Learner said": "Could you take me to Times Square"} or restating「目的地を伝えてください」.`;
+  }
+  if (question.id === "beginner-6") {
+    return `EXAMPLE for "No, we don't. Table for two, please.":
+GOOD sceneUpdateJa:
+予約がないことと2人分の席を伝えた。ホストは笑顔でうなずき、空いているテーブルへ案内し始めました。
+BAD (never): {"Learner said": "Table for two"} or restating「予約なしと人数を伝えてください」.`;
+  }
+  if (question.id === "beginner-7") {
+    return `EXAMPLE for "How much is this T-shirt? Do you have it in medium?":
+GOOD sceneUpdateJa:
+Tシャツの値段と medium サイズの在庫を尋ねた。店員は笑顔で答え、レジへ案内する段階に進みました。
+BAD (never): {"Learner said": "How much is this T-shirt?"} or restating「値段とサイズを聞いてください」.`;
+  }
+  if (question.id === "beginner-8") {
+    return `EXAMPLE for "I have a headache. Do you have something for headaches?":
+GOOD sceneUpdateJa:
+頭痛があると伝え、頭痛薬を探した。薬剤師はうなずいてカウンター奥から適切な薬を取り出し始めました。
+BAD (never): {"Learner said": "I have a headache"} or restating「症状と薬を伝えてください」.`;
+  }
   if (question.id === "intermediate-1") {
     return `EXAMPLE for "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.":
 GOOD sceneUpdateJa:
