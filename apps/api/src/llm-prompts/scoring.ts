@@ -57,6 +57,12 @@ GOOD sceneUpdateJa:
 Tシャツの値段と medium サイズの在庫を尋ねた。店員は笑顔で答え、レジへ案内する段階に進みました。
 BAD (never): {"Learner said": "How much is this T-shirt?"} or restating「値段とサイズを聞いてください」.`;
   }
+  if (question.id === "beginner-8") {
+    return `EXAMPLE for "I have a headache. Do you have something for headaches?":
+GOOD sceneUpdateJa:
+頭痛があると伝え、頭痛薬を探した。薬剤師はうなずいてカウンター奥から適切な薬を取り出し始めました。
+BAD (never): {"Learner said": "I have a headache"} or restating「症状と薬を伝えてください」.`;
+  }
   if (question.id === "intermediate-1") {
     return `EXAMPLE for "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone.":
 GOOD sceneUpdateJa:

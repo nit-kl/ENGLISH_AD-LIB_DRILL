@@ -1,4 +1,5 @@
 import type { Question } from "@english-adlib/domain";
+import { STAGES } from "@english-adlib/content";
 import { describe, expect, it } from "vitest";
 import {
   createPlayStateReset,
@@ -25,7 +26,8 @@ describe("game-flow", () => {
   describe("getQuestionsForStage", () => {
     it("ステージキーから問題一覧を返す", () => {
       const questions = getQuestionsForStage("beginner");
-      expect(questions.length).toBe(3);
+      expect(questions).toEqual(STAGES.beginner.questions);
+      expect(questions.length).toBeGreaterThan(0);
       expect(questions[0]?.id).toBe("beginner-1");
     });
 

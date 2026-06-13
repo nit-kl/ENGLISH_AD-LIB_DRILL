@@ -172,4 +172,27 @@ export const beginnerQuestions: Question[] = [
       },
     },
   },
+  {
+    id: "beginner-8",
+    stageKey: "beginner",
+    title: "薬局で体調を説明",
+    titleEn: "At the Pharmacy",
+    situation:
+      '海外旅行中、頭が痛くなって薬局に入りました。薬剤師に "How can I help you?" と聞かれました。症状と欲しい薬を伝えてください。',
+    role: "お客さん",
+    counterpart: "薬剤師",
+    icon: "💊",
+    hints: ["I have a ~", "Do you have something for ~", "headache"],
+    modelAnswer: "I have a headache. Do you have something for headaches?",
+    media: {
+      setup: {
+        youtubeVideoId: "LrmJDzZ00K4",
+        endSeconds: 29,
+      },
+      reveal: {
+        youtubeVideoId: "LrmJDzZ00K4",
+        startSeconds: 29,
+      },
+    },
+  },
 ];
